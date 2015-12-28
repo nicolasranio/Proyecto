@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/ScrollView"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="5dp">
+
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="10dp">
+
+        <TextView
+            android:id="@+id/tv_pwrd"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:text="Password:" />
+
+        <EditText
+            android:id="@+id/et_pwrd"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@id/tv_pwrd"
+            android:layout_below="@id/tv_pwrd"
+            android:inputType="textPassword"
+            android:maxLength="8"
+            />
+
+        <Button
+            android:id="@+id/btn_login"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignRight="@id/et_pwrd"
+            android:layout_below="@id/et_pwrd"
+            android:text="Login"
+            android:enabled="true"
+            android:focusable="true"
+            android:clickable="true" />
+
+        <TextView
+            android:id="@+id/tv_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@id/tv_pwrd"
+            android:layout_below="@id/btn_login"
+            android:text="@string/tv_name"
+            android:layout_marginTop="15dp"/>
+
+        <EditText
+            android:id="@+id/et_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@id/tv_pwrd"
+            android:layout_below="@+id/tv_name"
+            android:inputType="text"
+            android:editable="false"
+            android:enabled="false" />
+
+        <TextView
+            android:id="@+id/tv_server"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@id/tv_pwrd"
+            android:layout_below="@+id/et_name"
+            android:paddingTop="10dp"
+            android:text="@string/tv_server" />
+
+        <EditText
+            android:id="@+id/et_server"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@id/tv_pwrd"
+            android:layout_below="@+id/tv_server"
+            android:editable="false"
+            android:enabled="false"
+            android:paddingBottom="10dp" />
+
+
+        <Button
+            android:id="@+id/btn_test"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@id/tv_pwrd"
+            android:layout_below="@+id/et_server"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="5dp"
+            android:text="Test conectividad" />
+
+        <ImageView
+            android:id="@+id/icon_test"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/et_server"
+            android:layout_toRightOf="@+id/btn_test"
+            android:layout_alignRight="@id/et_pwrd"
+            android:layout_alignTop="@id/btn_test"
+            android:src="@drawable/blank" />
+
+        <Button
+            android:id="@+id/btn_sincro"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@id/tv_pwrd"
+            android:layout_alignRight="@id/btn_test"
+            android:layout_below="@id/btn_test"
+            android:text="Sincronizar DB" />
+
+        <ImageView
+            android:id="@+id/icon_sincro"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/btn_test"
+            android:layout_toRightOf="@+id/btn_sincro"
+            android:layout_alignRight="@id/et_pwrd"
+            android:layout_alignLeft="@id/icon_test"
+            android:src="@drawable/blank" />
+
+        <Button
+            android:id="@+id/btn_save"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/btn_sincro"
+            android:layout_alignRight="@id/et_pwrd"
+            android:layout_alignLeft="@id/et_pwrd"
+            android:layout_marginTop="15dp"
+            android:text="Guardar" />
+
+    </RelativeLayout>
+</ScrollView>
