@@ -1,10 +1,9 @@
 package com.acme.proyecto;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 
-/**
- * Created by nico on 25/11/2015.
- */
+
 public class DataQuery {
 
     public DataQuery() {
@@ -16,13 +15,26 @@ public class DataQuery {
     public Bundle Consultar() {
         Bundle datos = new Bundle();
 
-        String pwd = "12345";
-        datos.putString("password",pwd);
+        //consultar bd local y volcar datos en el bundle
+
+
+        datos.putString("password","12345");
         datos.putString("name","pepito");
         datos.putString("imei","22331122");
-        datos.putString("server","10.220.332.44");
+        datos.putString("server","192.168.16.104");
         datos.putString("lastsincro","24/12/2015 00:13");
         return datos;
+    }
+
+    public boolean Actualizar (Bundle datos){
+
+        String name = datos.getString("name");
+        String servidor = datos.getString("server");
+
+        //actualizar bd local con las variables
+
+        //si esta ok
+        return true;
     }
 
 }

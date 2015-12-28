@@ -5,11 +5,9 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.TextView;
 
-/**
- * Created by nico on 23/12/2015.
- */
 
 public class StateFragment extends Fragment {
 
@@ -42,13 +40,13 @@ public class StateFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_state, container, false);
 
         DataQuery datos = new DataQuery();
-        TextView etName = (TextView) rootView.findViewById(R.id.et_name);
+        EditText etName = (EditText) rootView.findViewById(R.id.et_name);
         etName.setText(datos.Consultar().getString("name"));
-        TextView etImei = (TextView) rootView.findViewById(R.id.et_imei);
+        EditText etImei = (EditText) rootView.findViewById(R.id.et_imei);
         etImei.setText(datos.Consultar().getString("imei"));
-        TextView etServer = (TextView) rootView.findViewById(R.id.et_server);
+        EditText etServer = (EditText) rootView.findViewById(R.id.et_server);
         etServer.setText(datos.Consultar().getString("server"));
-        TextView etLastSincro = (TextView) rootView.findViewById(R.id.et_lastact);
+        EditText etLastSincro = (EditText) rootView.findViewById(R.id.et_lastact);
         etLastSincro.setText(datos.Consultar().getString("lastsincro"));
         return rootView;
     }
