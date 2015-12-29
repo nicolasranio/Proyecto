@@ -6,9 +6,8 @@
     android:padding="5dp">
 
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:padding="10dp">
 
         <TextView
@@ -90,14 +89,15 @@
             android:text="Test conectividad" />
 
         <ImageView
-            android:id="@+id/icon_test"
+            android:id="@+id/img_test"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/et_server"
             android:layout_toRightOf="@+id/btn_test"
             android:layout_alignRight="@id/et_pwrd"
             android:layout_alignTop="@id/btn_test"
-            android:src="@drawable/blank" />
+            android:src="@drawable/ic_action_cancel"
+            android:visibility="invisible"/>
 
         <Button
             android:id="@+id/btn_sincro"
@@ -109,14 +109,15 @@
             android:text="Sincronizar DB" />
 
         <ImageView
-            android:id="@+id/icon_sincro"
+            android:id="@+id/img_sincro"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/btn_test"
             android:layout_toRightOf="@+id/btn_sincro"
             android:layout_alignRight="@id/et_pwrd"
-            android:layout_alignLeft="@id/icon_test"
-            android:src="@drawable/blank" />
+            android:layout_alignLeft="@id/img_test"
+            android:src="@drawable/blank"
+            android:visibility="invisible" />
 
         <Button
             android:id="@+id/btn_save"

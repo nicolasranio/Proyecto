@@ -21,7 +21,7 @@ public class DataQuery {
         datos.putString("password","12345");
         datos.putString("name","pepito");
         datos.putString("imei","22331122");
-        datos.putString("server","192.168.16.104");
+        datos.putString("server","192.168.16.1");
         datos.putString("lastsincro","24/12/2015 00:13");
         return datos;
     }

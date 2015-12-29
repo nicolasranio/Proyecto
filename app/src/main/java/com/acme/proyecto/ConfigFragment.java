@@ -1,5 +1,8 @@
 package com.acme.proyecto;
 
+import android.app.ProgressDialog;
+import android.media.Image;
+import android.os.AsyncTask;
 import android.os.StrictMode;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
@@ -9,14 +12,18 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.concurrent.Callable;
 
 
 public class ConfigFragment extends Fragment {
@@ -82,69 +89,103 @@ public class ConfigFragment extends Fragment {
         });
 
 
+        //----- empieza aca ----------------
+
         btnTest.setOnClickListener(new View.OnClickListener() {
+
+            ProgressDialog ringProgressDialog = null;
+
             public void onClick(View v) {
-                //desactiva temporalmente bloqueo de acceso a la red en el hilo principal
+                /*desactiva temporalmente bloqueo de acceso a la red en el hilo principal
                 StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.
                         Builder().permitNetwork().build());
-                //----
+                *///----
                 String ip = datos.Consultar().getString("server");
-                int puerto = 7;
-                Log.i("log", "socket " + ip + " : " + puerto);
-                try {
-                    Socket sk = new Socket(ip, puerto);
-                    BufferedReader entrada = new BufferedReader(
-                            new InputStreamReader(sk.getInputStream()));
-                    PrintWriter salida = new PrintWriter(
-                            new OutputStreamWriter(sk.getOutputStream()), true);
-                    Log.i("log","enviando...");
-                    salida.println("Hola Mundo");
-                    Log.i("log","recibiendo ... " + entrada.readLine());
-                    sk.close();
-                } catch (Exception e) {
-                    Log.i("log","error: " + e.toString());
-                }
+                ringProgressDialog = ProgressDialog.show(getContext(), "Un momento por favor ...", "Verificando conexion ...", true, false);
+                new PingTask().execute(ip);
             }
 
-
-        }
-
-    );
+            class PingTask extends AsyncTask<String, Void, Integer> {
 
 
-    btnSincro.setOnClickListener(new View.OnClickListener()
+                protected Integer doInBackground(String... params) {
+                    Log.i("Mi app", "Empezando hilo en segundo plano");
+                    Integer exitVal = 10;
+                    try {
+                        String line;
+                        Process proc = Runtime.getRuntime().exec("ping -c 4 " + params[0]);
+                        BufferedReader ebr = new BufferedReader(new InputStreamReader(proc.getErrorStream()));
+                        while ((line = ebr.readLine()) != null)
+                            Log.e("FXN-BOOTCLASSPATH", line);
+                        BufferedReader obr = new BufferedReader(new InputStreamReader(proc.getInputStream()));
+                        while ((line = obr.readLine()) != null)
+                            Log.i("FXN-BOOTCLASSPATH", line);
+                        exitVal = proc.waitFor();
+                        Log.d("FXN-BOOTCLASSPATH", "exitValue: " + exitVal);
+                        //Thread.sleep(5000);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    return exitVal;
+                }
 
-    {
-        public void onClick (View v){
+                @Override
+                protected void onPostExecute(Integer val) {
+                    ImageView image = (ImageView) rootView.findViewById(R.id.img_test);
+                    String msj;
+                    if (val == 0) {
+                        image.setImageResource(R.drawable.ic_action_tick);
+                        msj="Conexion exitosa!";
+                    } else {
+                        image.setImageResource(R.drawable.ic_action_cancel);
+                        msj="Se produjo un error \n al intentar la conexion";
+                    }
+                    image.setVisibility(View.VISIBLE);
+                    ringProgressDialog.dismiss();
+                    Toast.makeText(getContext(),
+                            msj, Toast.LENGTH_SHORT).show();
+                    //   super.onPostExecute(o);
+                }
+            }
+        });
 
+
+        //-------------------------
+
+
+        btnSincro.setOnClickListener(new View.OnClickListener()
+
+                                     {
+                                         public void onClick(View v) {
+
+                                         }
+                                     }
+
+        );
+
+
+        btnSave.setOnClickListener(new View.OnClickListener()
+
+                                   {
+                                       public void onClick(View v) {
+
+                                           Bundle args = new Bundle();
+                                           String msj;
+                                           args.putString("name", (rootView.findViewById(R.id.et_name)).toString());
+                                           args.putString("server", (rootView.findViewById(R.id.et_server)).toString());
+                                           if (datos.Actualizar(args)) {
+                                               msj = "Actualizacion correcta";
+                                           } else {
+                                               msj = "Se produjo un error al actualizar los datos";
+                                           }
+                                           Toast.makeText(getContext(), msj, Toast.LENGTH_SHORT).show();
+                                       }
+                                   }
+
+        );
+
+        // -- Fin Button Handlers---
+
+        return rootView;
     }
-    }
-
-    );
-
-
-    btnSave.setOnClickListener(new View.OnClickListener()
-
-    {
-        public void onClick (View v){
-
-        Bundle args = new Bundle();
-        String msj;
-        args.putString("name", (rootView.findViewById(R.id.et_name)).toString());
-        args.putString("server", (rootView.findViewById(R.id.et_server)).toString());
-        if (datos.Actualizar(args)) {
-            msj = "Actualizacion correcta";
-        } else {
-            msj = "Se produjo un error al actualizar los datos";
-        }
-        Toast.makeText(getContext(), msj, Toast.LENGTH_SHORT).show();
-    }
-    }
-
-    );
-
-    // -- Fin Button Handlers---
-
-    return rootView;
-}
 }
