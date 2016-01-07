@@ -1,12 +1,16 @@
 package com.acme.proyecto;
 
+import android.app.FragmentTransaction;
+import android.provider.ContactsContract;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.widget.Toast;
+import android.view.ViewGroup;
+
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -20,38 +24,25 @@ public class MainActivity extends AppCompatActivity {
         adapterViewPager = new MyPagerAdapter(getSupportFragmentManager());
         vpPager.setAdapter(adapterViewPager);
 
-
         //--- ViewPager handler ----------------
 
-        vpPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+        vpPager.addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
 
             // This method will be invoked when a new page becomes selected.
-
             @Override
             public void onPageSelected(int position) {
 
-                //si la pestaña seleccionada es estado, tengo que eliminar la instancia activa de ConfigFragment para que vuelva a loguear
+           /*     //si la pestaña seleccionada es estado, tengo que eliminar la instancia activa de ConfigFragment para que vuelva a loguear
                if (position==1){
-            //    vpPager.getAdapter().destroyItem()
-
-               }
-
-            }
-
-
-
-
-            // This method will be invoked when the current page is scrolled
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                // Code goes here
-            }
-
-            // Called when the scroll state changes:
-            // SCROLL_STATE_IDLE, SCROLL_STATE_DRAGGING, SCROLL_STATE_SETTLING
-            @Override
-            public void onPageScrollStateChanged(int state) {
-                // Code goes here
+                 //  vpPager.getAdapter().destroyItem((ViewGroup)findViewById(R.id.vpPager),vpPager.getAdapter().getItemPosition("ConfigFragment"),"ConfigFragment");
+                   FragmentManager fm = getSupportFragmentManager();
+                   List <Fragment> fragments = fm.getFragments();
+                   Fragment lastFragment = fragments.get(fragments.size() - 1);
+                   if ((lastFragment!=null) && (lastFragment instanceof ConfigFragment)) {
+                       FragmentTransaction ft = getFragmentManager().beginTransaction();
+                       lastFragment.getResources()
+                   }
+               }*/
             }
         });
 
@@ -64,6 +55,11 @@ public class MainActivity extends AppCompatActivity {
     // PagerAdapter
     public static class MyPagerAdapter extends FragmentPagerAdapter {
         private static int NUM_ITEMS = 2;
+
+        @Override
+        public void destroyItem(ViewGroup container, int position, Object object) {
+            super.destroyItem(container, position, object);
+        }
 
         public MyPagerAdapter(FragmentManager fragmentManager) {
             super(fragmentManager);
@@ -80,18 +76,12 @@ public class MainActivity extends AppCompatActivity {
         public Fragment getItem(int position) {
             switch (position) {
                 case 0: // Fragment # 0 - This will show FirstFragment
-                    return StateFragment.newInstance(0);
+                    return StateFragment.newInstance();
                 case 1: // Fragment # 0 - This will show FirstFragment different title
-                    return ConfigFragment.newInstance(1);
+                    return ConfigFragment.newInstance();
                 default:
                     return null;
             }
-        }
-
-        // Returns the page title for the top indicator
-        @Override
-        public CharSequence getPageTitle(int position) {
-            return "Page " + position;
         }
 
     }

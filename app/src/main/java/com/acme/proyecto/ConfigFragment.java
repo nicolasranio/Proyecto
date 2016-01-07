@@ -1,11 +1,17 @@
 package com.acme.proyecto;
 
 import android.app.ProgressDialog;
-import android.media.Image;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.AsyncTask;
-import android.os.StrictMode;
-import android.support.v4.app.Fragment;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.AlertDialog;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,41 +19,58 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
-import java.net.Socket;
-import java.util.concurrent.Callable;
 
 
 public class ConfigFragment extends Fragment {
 
-    // Store instance variables
-    // private String title;
-    private int page;
+    private static DataQuery datos;
 
     // newInstance constructor for creating fragment with arguments
-    public static ConfigFragment newInstance(int page) {
-        ConfigFragment frag = new ConfigFragment();
-        Bundle args = new Bundle();
-        args.putInt("page", page);
-        //    args.putString("title", title);
-        frag.setArguments(args);
-        return frag;
+    public static ConfigFragment newInstance() {
+        return new ConfigFragment();
     }
 
     // Store instance variables based on arguments passed
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        page = getArguments().getInt("page", 0);
-        //   title = getArguments().getString("title");
+        datos = new DataQuery(getActivity());
+        // Local Broadcast Receiver
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(new BroadcastReceiver(){
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                ActualizarCampos();
+            }
+        },new IntentFilter("BDLOCAL_UPDATE"));
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState) {
+        inicializar();
+        ActualizarCampos();
+
+    }
+
+    public void inicializar() {
+        if (this.isVisible()) { //si el fragment esta activo
+            try {
+                EditText pwd = (EditText) this.getView().findViewById(R.id.et_pwrd);
+                pwd.setText("");
+                this.getView().findViewById(R.id.btn_test).setEnabled(false);
+                this.getView().findViewById(R.id.btn_sincro).setEnabled(false);
+                this.getView().findViewById(R.id.btn_save).setEnabled(false);
+                this.getView().findViewById(R.id.et_name).setEnabled(false);
+                this.getView().findViewById(R.id.et_server).setEnabled(false);
+                this.getView().findViewById(R.id.et_pwrd).requestFocus();
+                //}
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     // Inflate the view for the fragment based on layout XML
@@ -55,24 +78,21 @@ public class ConfigFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.fragment_config, container, false);
-
-        final DataQuery datos = new DataQuery();
         final Button btnLogin = (Button) rootView.findViewById(R.id.btn_login);
         final EditText etPassword = (EditText) rootView.findViewById(R.id.et_pwrd);
         final Button btnTest = (Button) rootView.findViewById(R.id.btn_test);
         final Button btnSincro = (Button) rootView.findViewById(R.id.btn_sincro);
         final Button btnSave = (Button) rootView.findViewById(R.id.btn_save);
-        etPassword.requestFocus();
+        final EditText etName = (EditText) rootView.findViewById(R.id.et_name);
+        final EditText etServer = (EditText) rootView.findViewById(R.id.et_server);
 
 
-        //--  Button Handlers --
+        //-----------   Button Handlers   --------------------
 
         btnLogin.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
                 CharSequence pwd = etPassword.getText();
                 if (pwd.toString().equals(datos.Consultar().getString("password"))) {
-                    EditText etName = (EditText) rootView.findViewById(R.id.et_name);
-                    EditText etServer = (EditText) rootView.findViewById(R.id.et_server);
                     etName.setEnabled(true);
                     etName.setText(datos.Consultar().getString("name"));
                     etServer.setEnabled(true);
@@ -89,24 +109,19 @@ public class ConfigFragment extends Fragment {
         });
 
 
-        //----- empieza aca ----------------
+        //-----------------------------
 
         btnTest.setOnClickListener(new View.OnClickListener() {
 
             ProgressDialog ringProgressDialog = null;
 
             public void onClick(View v) {
-                /*desactiva temporalmente bloqueo de acceso a la red en el hilo principal
-                StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.
-                        Builder().permitNetwork().build());
-                *///----
                 String ip = datos.Consultar().getString("server");
-                ringProgressDialog = ProgressDialog.show(getContext(), "Un momento por favor ...", "Verificando conexion ...", true, false);
+                ringProgressDialog = ProgressDialog.show(getContext(), "Un momento por favor ...", "Verificando conexion", true, false);
                 new PingTask().execute(ip);
             }
 
             class PingTask extends AsyncTask<String, Void, Integer> {
-
 
                 protected Integer doInBackground(String... params) {
                     Log.i("Mi app", "Empezando hilo en segundo plano");
@@ -122,7 +137,6 @@ public class ConfigFragment extends Fragment {
                             Log.i("FXN-BOOTCLASSPATH", line);
                         exitVal = proc.waitFor();
                         Log.d("FXN-BOOTCLASSPATH", "exitValue: " + exitVal);
-                        //Thread.sleep(5000);
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -135,16 +149,14 @@ public class ConfigFragment extends Fragment {
                     String msj;
                     if (val == 0) {
                         image.setImageResource(R.drawable.ic_action_tick);
-                        msj="Conexion exitosa!";
+                        msj = "Conexion exitosa!";
                     } else {
                         image.setImageResource(R.drawable.ic_action_cancel);
-                        msj="Se produjo un error \n al intentar la conexion";
+                        msj = "Error! Servidor no alcanzable ";
                     }
                     image.setVisibility(View.VISIBLE);
                     ringProgressDialog.dismiss();
-                    Toast.makeText(getContext(),
-                            msj, Toast.LENGTH_SHORT).show();
-                    //   super.onPostExecute(o);
+                    Toast.makeText(getContext(), msj, Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -153,39 +165,78 @@ public class ConfigFragment extends Fragment {
         //-------------------------
 
 
-        btnSincro.setOnClickListener(new View.OnClickListener()
+        btnSincro.setOnClickListener(new View.OnClickListener() {
 
-                                     {
                                          public void onClick(View v) {
-
+                                         /* realizar un intent al servicio SincroBD para que sincronice las bd.
+                                            Ver si hay que hacerlo AsyncTask */
                                          }
                                      }
 
         );
 
 
-        btnSave.setOnClickListener(new View.OnClickListener()
+        //-----------------------
 
-                                   {
-                                       public void onClick(View v) {
+        btnSave.setOnClickListener(new View.OnClickListener() {
 
-                                           Bundle args = new Bundle();
-                                           String msj;
-                                           args.putString("name", (rootView.findViewById(R.id.et_name)).toString());
-                                           args.putString("server", (rootView.findViewById(R.id.et_server)).toString());
-                                           if (datos.Actualizar(args)) {
-                                               msj = "Actualizacion correcta";
-                                           } else {
-                                               msj = "Se produjo un error al actualizar los datos";
-                                           }
-                                           Toast.makeText(getContext(), msj, Toast.LENGTH_SHORT).show();
-                                       }
-                                   }
+            public void onClick(View v) {
 
-        );
+                new AlertDialog.Builder(getActivity())
+                        .setTitle("Guardar cambios")
+                        .setMessage("Desea guardar los cambios realizados?")
+                        .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                Bundle aux = datos.Consultar();
+                                //obtengo el imei del telefono llamando a SystemService
+                                TelephonyManager mngr = (TelephonyManager) getActivity().getSystemService(Context.TELEPHONY_SERVICE);
+                                String IMEI_PHONE = mngr.getDeviceId();
+                                String msj;
+                                if ((etName.getText().toString().equals(aux.getString("name"))) && (etServer.getText().toString().equals(aux.getString("server"))) && (IMEI_PHONE.equals(aux.getString("imei")))) {
+                                    //no se produjeron cambios
+                                    msj = "No se produjeron cambios...";
+                                } else {
+                                    Log.i("Aux","Lo que habia en etName: "+etName.getText());
+                                    //hay cambios que guardar
+                                    Bundle args = new Bundle();
+                                    args.putString("name", etName.getText().toString());
+                                    args.putString("server", etServer.getText().toString());
+                                    args.putString("imei", IMEI_PHONE);
+                                    if (datos.Actualizar(args)) {
+                                        ActualizarCampos();
+                                        msj = "Actualizacion correcta";
+                                   /*     Intent intent = new Intent(getActivity(), StateFragment.);
+                                        startActivity(intent);*/
+                                    } else {
+                                        msj = "Se produjo un error\n al actualizar los datos";
+                                    }
+                                }
+                                inicializar();
+                                Toast.makeText(getContext(), msj, Toast.LENGTH_SHORT).show();
+                            }
+                        })
+                        .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                ActualizarCampos();
+                                inicializar();
+                            }
+                        })
+                        .show();
+            }});
 
-        // -- Fin Button Handlers---
+    // -- Fin Button Handlers---
 
-        return rootView;
+    return rootView;
+}
+
+    private void ActualizarCampos(){
+
+        Bundle args = datos.Consultar();
+        try {
+            EditText etName = (EditText) this.getView().findViewById(R.id.et_name);
+            EditText etServer = (EditText) this.getView().findViewById(R.id.et_server);
+            etName.setText(args.getString("name"));
+            etServer.setText(args.getString("server"));
+        }catch(NullPointerException e){e.printStackTrace();}
     }
 }

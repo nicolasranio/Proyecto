@@ -26,6 +26,7 @@
             android:layout_below="@id/tv_pwrd"
             android:inputType="textPassword"
             android:maxLength="8"
+            android:focusable="true"
             />
 
         <Button
@@ -36,7 +37,6 @@
             android:layout_below="@id/et_pwrd"
             android:text="Login"
             android:enabled="true"
-            android:focusable="true"
             android:clickable="true" />
 
         <TextView
@@ -56,7 +56,7 @@
             android:layout_below="@+id/tv_name"
             android:inputType="text"
             android:editable="false"
-            android:enabled="false" />
+             />
 
         <TextView
             android:id="@+id/tv_server"
@@ -74,8 +74,9 @@
             android:layout_alignLeft="@id/tv_pwrd"
             android:layout_below="@+id/tv_server"
             android:editable="false"
-            android:enabled="false"
-            android:paddingBottom="10dp" />
+
+            android:paddingBottom="10dp"
+            android:inputType="text" />
 
 
         <Button
@@ -97,7 +98,8 @@
             android:layout_alignRight="@id/et_pwrd"
             android:layout_alignTop="@id/btn_test"
             android:src="@drawable/ic_action_cancel"
-            android:visibility="invisible"/>
+            android:visibility="invisible"
+            android:contentDescription="Test_conectividad" />
 
         <Button
             android:id="@+id/btn_sincro"
@@ -117,7 +119,8 @@
             android:layout_alignRight="@id/et_pwrd"
             android:layout_alignLeft="@id/img_test"
             android:src="@drawable/blank"
-            android:visibility="invisible" />
+            android:visibility="invisible"
+            android:contentDescription="Sincronizar_DB" />
 
         <Button
             android:id="@+id/btn_save"

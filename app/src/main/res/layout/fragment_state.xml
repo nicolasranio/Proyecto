@@ -6,7 +6,6 @@
     android:padding="10dp">
 
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:padding="5dp">
@@ -22,7 +21,7 @@
             android:text="@string/tv_name" />
 
         <EditText
-            android:id="@+id/et_name"
+            android:id="@+id/et_name_r"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/tv_name"
@@ -35,17 +34,16 @@
             android:id="@+id/tv_imei"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/et_name"
+            android:layout_below="@+id/et_name_r"
             android:paddingBottom="5dp"
             android:paddingTop="5dp"
             android:text="@string/tv_imei" />
 
         <EditText
-            android:id="@+id/et_imei"
+            android:id="@+id/et_imei_r"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/tv_imei"
-
             android:editable="false"
             android:enabled="false"
             android:inputType="number"
@@ -55,32 +53,32 @@
             android:id="@+id/tv_server"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/et_imei"
+            android:layout_below="@+id/et_imei_r"
             android:paddingBottom="5dp"
             android:paddingTop="5dp"
             android:text="@string/tv_server" />
 
         <EditText
-            android:id="@+id/et_server"
+            android:id="@+id/et_server_r"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/tv_server"
-
             android:editable="false"
             android:enabled="false"
-            android:paddingBottom="10dp" />
+            android:paddingBottom="10dp"
+            android:inputType="text" />
 
         <TextView
             android:id="@+id/tv_lastact"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/et_server"
+            android:layout_below="@+id/et_server_r"
             android:paddingBottom="5dp"
             android:paddingTop="5dp"
             android:text="@string/tv_lastact" />
 
         <EditText
-            android:id="@+id/et_lastact"
+            android:id="@+id/et_lastact_r"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
@@ -90,6 +88,15 @@
             android:enabled="false"
             android:inputType="datetime"
             android:paddingBottom="10dp" />
+
+<!--        <Button
+            android:id="@+id/btn_actualizar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/et_lastact"
+            android:layout_alignParentRight="true"
+            android:text="Actualizar"
+            /-->
 
     </RelativeLayout>
 
