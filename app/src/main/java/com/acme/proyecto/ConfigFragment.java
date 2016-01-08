@@ -1,5 +1,6 @@
 package com.acme.proyecto;
 
+import android.app.ActivityManager;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -17,8 +18,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Switch;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
@@ -28,6 +31,7 @@ import java.io.InputStreamReader;
 public class ConfigFragment extends Fragment {
 
     private static DataQuery datos;
+    private String SERVICE_NAME = "ServicioGPS";
 
     // newInstance constructor for creating fragment with arguments
     public static ConfigFragment newInstance() {
@@ -40,12 +44,12 @@ public class ConfigFragment extends Fragment {
         super.onCreate(savedInstanceState);
         datos = new DataQuery(getActivity());
         // Local Broadcast Receiver
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(new BroadcastReceiver(){
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 ActualizarCampos();
             }
-        },new IntentFilter("BDLOCAL_UPDATE"));
+        }, new IntentFilter("BDLOCAL_UPDATE"));
     }
 
     @Override
@@ -65,13 +69,26 @@ public class ConfigFragment extends Fragment {
                 this.getView().findViewById(R.id.btn_save).setEnabled(false);
                 this.getView().findViewById(R.id.et_name).setEnabled(false);
                 this.getView().findViewById(R.id.et_server).setEnabled(false);
+                this.getView().findViewById(R.id.sw_service).setEnabled(false);
                 this.getView().findViewById(R.id.et_pwrd).requestFocus();
-                //}
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
+
+    //verifica el estado encendido del servicio
+    private boolean EstadoServicioGPS() {
+        ActivityManager manager =  (ActivityManager) getContext().getSystemService(Context.ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (SERVICE_NAME.equals(service.service.getClassName())) {
+                    return true;
+                }
+            }
+            Toast.makeText(getContext(),"EL servicio GPS no esta iniciado", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+
 
     // Inflate the view for the fragment based on layout XML
     @Override
@@ -85,6 +102,7 @@ public class ConfigFragment extends Fragment {
         final Button btnSave = (Button) rootView.findViewById(R.id.btn_save);
         final EditText etName = (EditText) rootView.findViewById(R.id.et_name);
         final EditText etServer = (EditText) rootView.findViewById(R.id.et_server);
+        final Switch swService = (Switch) rootView.findViewById(R.id.sw_service);
 
 
         //-----------   Button Handlers   --------------------
@@ -100,6 +118,9 @@ public class ConfigFragment extends Fragment {
                     btnTest.setEnabled(true);
                     btnSincro.setEnabled(true);
                     btnSave.setEnabled(true);
+                    swService.setEnabled(true);
+                    swService.setChecked(EstadoServicioGPS());
+
                 } else {
                     etPassword.setText("");
                     Toast.makeText(getContext(),
@@ -178,6 +199,34 @@ public class ConfigFragment extends Fragment {
 
         //-----------------------
 
+        swService.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+                                                 @Override
+                                                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                                                     Intent serviceIntent = new Intent();
+                                                     serviceIntent.setAction("com.acme.ServicioGPS");
+                                                     if (isChecked) {
+                                                         //enciendo el servicio
+                                                         try {
+                                                             getContext().startService(serviceIntent);
+                                                         } catch (Exception e) {
+                                                             e.printStackTrace();
+                                                         }
+                                                     } else {
+                                                         //apago el servicio
+                                                         try {
+                                                             getContext().stopService(serviceIntent);
+                                                         } catch (Exception e) {
+                                                             e.printStackTrace();
+                                                         }
+                                                     }
+                                                 }
+                                             }
+        );
+
+
+        //---------------------------
+
         btnSave.setOnClickListener(new View.OnClickListener() {
 
             public void onClick(View v) {
@@ -196,7 +245,7 @@ public class ConfigFragment extends Fragment {
                                     //no se produjeron cambios
                                     msj = "No se produjeron cambios...";
                                 } else {
-                                    Log.i("Aux","Lo que habia en etName: "+etName.getText());
+                                    Log.i("Aux", "Lo que habia en etName: " + etName.getText());
                                     //hay cambios que guardar
                                     Bundle args = new Bundle();
                                     args.putString("name", etName.getText().toString());
@@ -205,8 +254,6 @@ public class ConfigFragment extends Fragment {
                                     if (datos.Actualizar(args)) {
                                         ActualizarCampos();
                                         msj = "Actualizacion correcta";
-                                   /*     Intent intent = new Intent(getActivity(), StateFragment.);
-                                        startActivity(intent);*/
                                     } else {
                                         msj = "Se produjo un error\n al actualizar los datos";
                                     }
@@ -222,14 +269,15 @@ public class ConfigFragment extends Fragment {
                             }
                         })
                         .show();
-            }});
+            }
+        });
 
-    // -- Fin Button Handlers---
+        // -- Fin Button Handlers---
 
-    return rootView;
-}
+        return rootView;
+    }
 
-    private void ActualizarCampos(){
+    private void ActualizarCampos() {
 
         Bundle args = datos.Consultar();
         try {
@@ -237,6 +285,8 @@ public class ConfigFragment extends Fragment {
             EditText etServer = (EditText) this.getView().findViewById(R.id.et_server);
             etName.setText(args.getString("name"));
             etServer.setText(args.getString("server"));
-        }catch(NullPointerException e){e.printStackTrace();}
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        }
     }
 }
