@@ -10,6 +10,16 @@
         android:layout_height="match_parent"
         android:padding="5dp">
 
+        <!-- hack ocultar keyboard popup-->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@android:color/transparent"
+            android:focusable="true"
+            android:focusableInTouchMode="true">
+        </LinearLayout>
+        <!--fin hack-->
+
         <TextView
             android:id="@+id/tv_name"
             android:layout_width="match_parent"

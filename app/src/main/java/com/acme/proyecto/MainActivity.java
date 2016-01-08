@@ -1,7 +1,6 @@
 package com.acme.proyecto;
 
-import android.app.FragmentTransaction;
-import android.provider.ContactsContract;
+
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -10,11 +9,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.ViewGroup;
 
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    FragmentPagerAdapter adapterViewPager;
+    MyPagerAdapter adapterViewPager;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,19 +30,8 @@ public class MainActivity extends AppCompatActivity {
             // This method will be invoked when a new page becomes selected.
             @Override
             public void onPageSelected(int position) {
-
-           /*     //si la pestaña seleccionada es estado, tengo que eliminar la instancia activa de ConfigFragment para que vuelva a loguear
-               if (position==1){
-                 //  vpPager.getAdapter().destroyItem((ViewGroup)findViewById(R.id.vpPager),vpPager.getAdapter().getItemPosition("ConfigFragment"),"ConfigFragment");
-                   FragmentManager fm = getSupportFragmentManager();
-                   List <Fragment> fragments = fm.getFragments();
-                   Fragment lastFragment = fragments.get(fragments.size() - 1);
-                   if ((lastFragment!=null) && (lastFragment instanceof ConfigFragment)) {
-                       FragmentTransaction ft = getFragmentManager().beginTransaction();
-                       lastFragment.getResources()
-                   }
-               }*/
             }
+
         });
 
         //-------------Fin ViewPager handler-------------------
@@ -84,6 +72,16 @@ public class MainActivity extends AppCompatActivity {
             }
         }
 
+        @Override
+        public CharSequence getPageTitle(int position) {
+            switch (position) {
+                case 0:
+                    return "Estado";
+                case 1:
+                    return "Configuracion";
+                default: return "";
+            }
+        }
     }
     //---fin PagerAdapter
 
