@@ -43,8 +43,8 @@ public class DataAccessLocal extends SQLiteAssetHelper {
             arg.putString("imei", cur.getString(2));
             arg.putString("server", cur.getString(3));
             arg.putString("lastsincro", cur.getString(4));
-            Log.i("Datos leidos", cur.getString(0) + "," + cur.getString(1) + "," + cur.getString(2) + "," + cur.getString(3) + "," +
-                    cur.getString(4) + ".");
+       //     Log.i("Datos leidos", cur.getString(0) + "," + cur.getString(1) + "," + cur.getString(2) + "," + cur.getString(3) + "," +
+         //           cur.getString(4) + ".");
         }
         db.close();
         return arg;

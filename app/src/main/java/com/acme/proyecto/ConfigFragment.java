@@ -32,7 +32,8 @@ public class ConfigFragment extends Fragment {
 
     private static DataAccessLocal datos;
     private String SERVICE_NAME = "com.acme.proyecto.ServicioGPSResidente";
-    private boolean estadoServicioGPS;
+    private boolean estadoServicioGPS = false;
+    private boolean swOn=false;
 
     // newInstance constructor for creating fragment with arguments
     public static ConfigFragment newInstance() {
@@ -48,7 +49,7 @@ public class ConfigFragment extends Fragment {
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                ActualizarCampos();
+                actualizarCampos();
             }
         }, new IntentFilter("BDLOCAL_UPDATE"));
     }
@@ -56,7 +57,7 @@ public class ConfigFragment extends Fragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         inicializar();
-        ActualizarCampos();
+        actualizarCampos();
 
     }
 
@@ -79,22 +80,21 @@ public class ConfigFragment extends Fragment {
     }
 
     //verifica el estado encendido del servicio
-    private void EstadoServicioGPS() {
+    private boolean EstadoServicioGPS() {
         ActivityManager manager = (ActivityManager) getContext().getSystemService(getContext().ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo serv : manager.getRunningServices(Integer.MAX_VALUE)) {
             Log.i("Servicio", serv.service.getClassName());
             if (SERVICE_NAME.equals(serv.service.getClassName())) {
-                Toast.makeText(getContext(), "EL servicio GPS ya se encuentra iniciado", Toast.LENGTH_SHORT).show();
-                estadoServicioGPS = true;
+                Log.i("ServicioGPS", "EL servicio GPS ya se encuentra iniciado");
+                return true;
             }
         }
-        Toast.makeText(getContext(), "EL servicio GPS no esta iniciado", Toast.LENGTH_SHORT).show();
-        estadoServicioGPS = false;
+        Log.i("ServicioGPS", "EL servicio GPS no esta iniciado");
+        return false;
     }
 
 
     // Inflate the view for the fragment based on layout XML
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.fragment_config, container, false);
@@ -121,9 +121,10 @@ public class ConfigFragment extends Fragment {
                     btnTest.setEnabled(true);
                     btnSincro.setEnabled(true);
                     btnSave.setEnabled(true);
+                    estadoServicioGPS=EstadoServicioGPS();  //actualizo estado del servicio
                     swService.setEnabled(true);
+                    swOn=true;  //cambio valor para usarlo en el cond del switch handler
                     swService.setChecked(estadoServicioGPS);
-
                 } else {
                     etPassword.setText("");
                     Toast.makeText(getContext(),
@@ -201,26 +202,46 @@ public class ConfigFragment extends Fragment {
 
 
         //-----------------------
+        swService.setOnClickListener(new CompoundButton.OnClickListener(){
 
+            @Override
+            public void onClick(View v) {
+                Intent serviceIntent = new Intent(getContext(), ServicioGPSResidente.class);
+                Log.i("Swith","Click en el switch");
+                if (swService.isChecked()) {
+                    //enciendo el servicio
+                    getContext().startService(serviceIntent);
+                    Log.i("Switch", "El servicio estaba OFF y se intento poner en ON, swOn=" + swOn);
+                    Toast.makeText(getContext(),"Guarde cambios para \n " +
+                            "actualizar el servicio", Toast.LENGTH_SHORT).show();
+                } else {
+                    //apago el servicio
+                    getContext().stopService(serviceIntent);
+                    Log.i("Switch", "El servicio estaba ON y se intento poner en OFF");
+                    Toast.makeText(getContext(),"Guarde cambios para \n " +
+                            "actualizar el servicio", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        //---------------
         swService.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
 
                                                  @Override
                                                  public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                                                      Intent serviceIntent = new Intent(getContext(), ServicioGPSResidente.class);
-                                                     if (isChecked) {
+                                                     if ((isChecked) && (swOn==false)) {
                                                          //enciendo el servicio
-                                                         try {
                                                              getContext().startService(serviceIntent);
-                                                         } catch (Exception e) {
-                                                             e.printStackTrace();
-                                                         }
-                                                     } else {
+                                                             Log.i("Switch", "El servicio estaba OFF y se intento poner en ON, swOn=" + swOn);
+                                                         Toast.makeText(getContext(),"Guarde cambios para \n " +
+                                                                 "actualizar el servicio", Toast.LENGTH_SHORT).show();
+                                                     } else if (!isChecked) {
                                                          //apago el servicio
-                                                         try {
                                                              getContext().stopService(serviceIntent);
-                                                         } catch (Exception e) {
-                                                             e.printStackTrace();
-                                                         }
+                                                             Log.i("Switch", "El servicio estaba ON y se intento poner en OFF");
+                                                         Toast.makeText(getContext(),"Guarde cambios para \n " +
+                                                                 "actualizar el servicio", Toast.LENGTH_SHORT).show();
                                                      }
                                                  }
                                              }
@@ -261,7 +282,7 @@ public class ConfigFragment extends Fragment {
                                     args.putString("server", etServer.getText().toString());
                                     args.putString("imei", IMEI_PHONE);
                                     if (datos.Actualizar(args)) {
-                                        ActualizarCampos();
+                                        actualizarCampos();
                                         msj = "Actualizacion correcta";
                                     } else {
                                         msj = "Se produjo un error\n al actualizar los datos";
@@ -273,7 +294,7 @@ public class ConfigFragment extends Fragment {
                         })
                         .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
-                                ActualizarCampos();
+                                actualizarCampos();
                                 inicializar();
                             }
                         })
@@ -286,16 +307,20 @@ public class ConfigFragment extends Fragment {
         return rootView;
     }
 
-    private void ActualizarCampos() {
+    private void actualizarCampos() {
 
         Bundle args = datos.Consultar();
         try {
             EditText etName = (EditText) this.getView().findViewById(R.id.et_name);
             EditText etServer = (EditText) this.getView().findViewById(R.id.et_server);
+            //   Switch swService = (Switch) this.getView().findViewById(R.id.sw_service);
             etName.setText(args.getString("name"));
             etServer.setText(args.getString("server"));
+            //   EstadoServicioGPS();
+            //   swService.setChecked(estadoServicioGPS);
         } catch (NullPointerException e) {
             e.printStackTrace();
         }
     }
 }
+
