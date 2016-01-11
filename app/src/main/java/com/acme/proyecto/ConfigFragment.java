@@ -30,8 +30,9 @@ import java.io.InputStreamReader;
 
 public class ConfigFragment extends Fragment {
 
-    private static DataQuery datos;
-    private String SERVICE_NAME = "ServicioGPS";
+    private static DataAccessLocal datos;
+    private String SERVICE_NAME = "com.acme.proyecto.ServicioGPSResidente";
+    private boolean estadoServicioGPS;
 
     // newInstance constructor for creating fragment with arguments
     public static ConfigFragment newInstance() {
@@ -42,7 +43,7 @@ public class ConfigFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        datos = new DataQuery(getActivity());
+        datos = new DataAccessLocal(getActivity());
         // Local Broadcast Receiver
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(new BroadcastReceiver() {
             @Override
@@ -78,16 +79,18 @@ public class ConfigFragment extends Fragment {
     }
 
     //verifica el estado encendido del servicio
-    private boolean EstadoServicioGPS() {
-        ActivityManager manager =  (ActivityManager) getContext().getSystemService(Context.ACTIVITY_SERVICE);
-        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-            if (SERVICE_NAME.equals(service.service.getClassName())) {
-                    return true;
-                }
+    private void EstadoServicioGPS() {
+        ActivityManager manager = (ActivityManager) getContext().getSystemService(getContext().ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo serv : manager.getRunningServices(Integer.MAX_VALUE)) {
+            Log.i("Servicio", serv.service.getClassName());
+            if (SERVICE_NAME.equals(serv.service.getClassName())) {
+                Toast.makeText(getContext(), "EL servicio GPS ya se encuentra iniciado", Toast.LENGTH_SHORT).show();
+                estadoServicioGPS = true;
             }
-            Toast.makeText(getContext(),"EL servicio GPS no esta iniciado", Toast.LENGTH_SHORT).show();
-            return false;
         }
+        Toast.makeText(getContext(), "EL servicio GPS no esta iniciado", Toast.LENGTH_SHORT).show();
+        estadoServicioGPS = false;
+    }
 
 
     // Inflate the view for the fragment based on layout XML
@@ -119,7 +122,7 @@ public class ConfigFragment extends Fragment {
                     btnSincro.setEnabled(true);
                     btnSave.setEnabled(true);
                     swService.setEnabled(true);
-                    swService.setChecked(EstadoServicioGPS());
+                    swService.setChecked(estadoServicioGPS);
 
                 } else {
                     etPassword.setText("");
@@ -203,8 +206,7 @@ public class ConfigFragment extends Fragment {
 
                                                  @Override
                                                  public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                                                     Intent serviceIntent = new Intent();
-                                                     serviceIntent.setAction("com.acme.ServicioGPS");
+                                                     Intent serviceIntent = new Intent(getContext(), ServicioGPSResidente.class);
                                                      if (isChecked) {
                                                          //enciendo el servicio
                                                          try {
@@ -241,11 +243,18 @@ public class ConfigFragment extends Fragment {
                                 TelephonyManager mngr = (TelephonyManager) getActivity().getSystemService(Context.TELEPHONY_SERVICE);
                                 String IMEI_PHONE = mngr.getDeviceId();
                                 String msj;
-                                if ((etName.getText().toString().equals(aux.getString("name"))) && (etServer.getText().toString().equals(aux.getString("server"))) && (IMEI_PHONE.equals(aux.getString("imei")))) {
+                                //if ((etName.getText().toString().equals(aux.getString("name"))) && (etServer.getText().toString().equals(aux.getString("server"))) && (IMEI_PHONE.equals(aux.getString("imei")))) {
+                                if ((etName.getText().toString().equals(aux.getString("name"))) && (etServer.getText().toString().equals(aux.getString("server"))) && (IMEI_PHONE.equals(aux.getString("imei"))) && (swService.isChecked() == estadoServicioGPS)) {
                                     //no se produjeron cambios
                                     msj = "No se produjeron cambios...";
+                                } else if (swService.isChecked() != estadoServicioGPS) {
+                                    //se cambio el estado del servicio
+                                    if (swService.isChecked()) {
+                                        msj = "Servicio iniciado";
+                                    } else {
+                                        msj = "Servicio detenido";
+                                    }
                                 } else {
-                                    Log.i("Aux", "Lo que habia en etName: " + etName.getText());
                                     //hay cambios que guardar
                                     Bundle args = new Bundle();
                                     args.putString("name", etName.getText().toString());

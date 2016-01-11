@@ -5,22 +5,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
-import android.widget.TextView;
-
-import java.util.ArrayList;
 
 
 public class StateFragment extends Fragment {
 
-    private static DataQuery datos;
+    private static DataAccessLocal datos;
 
     // newInstance constructor for creating fragment with arguments
     public static StateFragment newInstance() {
@@ -30,7 +25,7 @@ public class StateFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        datos = new DataQuery(getActivity());
+        datos = new DataAccessLocal(getActivity());
         LocalBroadcastManager.getInstance(getActivity()).registerReceiver(new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {

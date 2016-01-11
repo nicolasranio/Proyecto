@@ -13,7 +13,7 @@ import android.util.Log;
 import com.readystatesoftware.sqliteasset.SQLiteAssetHelper;
 
 
-public class DataQuery extends SQLiteAssetHelper {
+public class DataAccessLocal extends SQLiteAssetHelper {
 
     private static String DB_NAME = "DBAppLocal.db";
     private static int DB_VERSION = 1;
@@ -22,20 +22,11 @@ public class DataQuery extends SQLiteAssetHelper {
     //   private static String sqlCreate = "CREATE TABLE DataApp (password TEXT, nombre TEXT, imei TEXT, server TEXT, lastsincro TEXT)";
 
 
-    public DataQuery(Context context) {
+    public DataAccessLocal(Context context) {
 
         super(context, DB_NAME, null, DB_VERSION);
         this.context = context;
     }
-
-   /* @Override
-    public void onCreate(SQLiteDatabase db) {
-        if (db.isReadOnly()) {
-            db = getWritableDatabase();
-        }
-        db.execSQL(sqlCreate);
-    }*/
-
 
     //consulta la base sql local y levanta los datos de la configuracion
     public Bundle Consultar() {
