@@ -83,13 +83,13 @@ public class ConfigFragment extends Fragment {
     private boolean EstadoServicioGPS() {
         ActivityManager manager = (ActivityManager) getContext().getSystemService(getContext().ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo serv : manager.getRunningServices(Integer.MAX_VALUE)) {
-            Log.i("Servicio", serv.service.getClassName());
+      //      Log.i("Servicio", serv.service.getClassName());
             if (SERVICE_NAME.equals(serv.service.getClassName())) {
-                Log.i("ServicioGPS", "EL servicio GPS ya se encuentra iniciado");
+      //          Log.i("ServicioGPS", "EL servicio GPS ya se encuentra iniciado");
                 return true;
             }
         }
-        Log.i("ServicioGPS", "EL servicio GPS no esta iniciado");
+    //    Log.i("ServicioGPS", "EL servicio GPS no esta iniciado");
         return false;
     }
 
@@ -211,17 +211,13 @@ public class ConfigFragment extends Fragment {
                 if (swService.isChecked()) {
                     //enciendo el servicio
                     getContext().startService(serviceIntent);
-                    Log.i("Switch", "El servicio estaba OFF y se intento poner en ON, swOn=" + swOn);
-                    Toast.makeText(getContext(),"Guarde cambios para \n " +
-                            "actualizar el servicio", Toast.LENGTH_SHORT).show();
                 } else {
                     //apago el servicio
                     getContext().stopService(serviceIntent);
-                    Log.i("Switch", "El servicio estaba ON y se intento poner en OFF");
+                }
                     Toast.makeText(getContext(),"Guarde cambios para \n " +
                             "actualizar el servicio", Toast.LENGTH_SHORT).show();
                 }
-            }
         });
 
         //---------------
@@ -230,18 +226,12 @@ public class ConfigFragment extends Fragment {
                                                  @Override
                                                  public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                                                      Intent serviceIntent = new Intent(getContext(), ServicioGPSResidente.class);
-                                                     if ((isChecked) && (swOn==false)) {
+                                                     if ((isChecked) && (!swOn)) {
                                                          //enciendo el servicio
                                                              getContext().startService(serviceIntent);
-                                                             Log.i("Switch", "El servicio estaba OFF y se intento poner en ON, swOn=" + swOn);
-                                                         Toast.makeText(getContext(),"Guarde cambios para \n " +
-                                                                 "actualizar el servicio", Toast.LENGTH_SHORT).show();
                                                      } else if (!isChecked) {
                                                          //apago el servicio
                                                              getContext().stopService(serviceIntent);
-                                                             Log.i("Switch", "El servicio estaba ON y se intento poner en OFF");
-                                                         Toast.makeText(getContext(),"Guarde cambios para \n " +
-                                                                 "actualizar el servicio", Toast.LENGTH_SHORT).show();
                                                      }
                                                  }
                                              }
@@ -264,7 +254,6 @@ public class ConfigFragment extends Fragment {
                                 TelephonyManager mngr = (TelephonyManager) getActivity().getSystemService(Context.TELEPHONY_SERVICE);
                                 String IMEI_PHONE = mngr.getDeviceId();
                                 String msj;
-                                //if ((etName.getText().toString().equals(aux.getString("name"))) && (etServer.getText().toString().equals(aux.getString("server"))) && (IMEI_PHONE.equals(aux.getString("imei")))) {
                                 if ((etName.getText().toString().equals(aux.getString("name"))) && (etServer.getText().toString().equals(aux.getString("server"))) && (IMEI_PHONE.equals(aux.getString("imei"))) && (swService.isChecked() == estadoServicioGPS)) {
                                     //no se produjeron cambios
                                     msj = "No se produjeron cambios...";
@@ -313,11 +302,8 @@ public class ConfigFragment extends Fragment {
         try {
             EditText etName = (EditText) this.getView().findViewById(R.id.et_name);
             EditText etServer = (EditText) this.getView().findViewById(R.id.et_server);
-            //   Switch swService = (Switch) this.getView().findViewById(R.id.sw_service);
             etName.setText(args.getString("name"));
             etServer.setText(args.getString("server"));
-            //   EstadoServicioGPS();
-            //   swService.setChecked(estadoServicioGPS);
         } catch (NullPointerException e) {
             e.printStackTrace();
         }

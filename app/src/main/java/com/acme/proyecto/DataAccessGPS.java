@@ -5,10 +5,8 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
+import android.util.Log;
 
-/**
- * Created by nico on 08/01/2016.
- */
 public class DataAccessGPS extends SQLiteOpenHelper {
 
     private static String DB_NAME = "DBTracking.db";
@@ -27,7 +25,7 @@ public class DataAccessGPS extends SQLiteOpenHelper {
         if (db.isReadOnly()) {
             db = getWritableDatabase();
         }
-        String createTable = "CREATE TABLE " + TABLE_NAME + " (imei TEXT, fecha TEXT, hora TEXT, coordenada TEXT)";
+        String createTable = "CREATE TABLE " + TABLE_NAME + " (imei TEXT, fecha TEXT, hora TEXT, latitud TEXT, longitud TEXT)";
         db.execSQL(createTable);
     }
 
@@ -36,8 +34,10 @@ public class DataAccessGPS extends SQLiteOpenHelper {
     }
 
     public void nuevaCoordenada(Bundle datos) {
-        String queryInsert = "INSERT INTO " + TABLE_NAME + " (imei,fecha,hora,coordenada) VALUES ('" + datos.getString("imei") +
-                "','" + datos.getString("fecha") + "','" + datos.getString("hora") + "','" + datos.getString("coordenada") + "')";
+        String queryInsert = "INSERT INTO " + TABLE_NAME + " (imei,fecha,hora,latitud,longitud) VALUES ('" + datos.getString("imei") +
+                "','" + datos.getString("fecha") + "','" + datos.getString("hora") + "','" + Double.toString(datos.getDouble("lat")) + "','"
+                + Double.toString(datos.getDouble("long")) +"')";
+        Log.i("SQL",queryInsert);
         SQLiteDatabase db = getWritableDatabase();
         if (db != null) {
             try {
