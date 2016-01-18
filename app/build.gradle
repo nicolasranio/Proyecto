@@ -23,6 +23,14 @@ dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.1.1'
+    //DB adding
     compile 'com.readystatesoftware.sqliteasset:sqliteassethelper:+'
+    //Google Play Location services
     compile 'com.google.android.gms:play-services-location:8.4.0'
+    //Volley library for http requests - ver si hace falta
+    //compile 'com.mcxiaoke.volley:library:1.0.16'
+    //Libreria Gson (parser JSON)
+    compile 'com.google.code.gson:gson:2.3.1'
+    //Android Asynchronous Http Client
+    compile 'com.loopj.android:android-async-http:1.4.9'
 }

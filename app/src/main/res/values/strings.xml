@@ -4,5 +4,7 @@
     <string name="tv_name">Nombre</string>
     <string name="tv_imei">IMEI</string>
     <string name="tv_server">Servidor</string>
+    <string name="tv_puerto">Puerto</string>
     <string name="tv_lastact">Ultima sincronizacion</string>
+    <string name="postTarget">proyecto/insert_location.php</string>
 </resources>
