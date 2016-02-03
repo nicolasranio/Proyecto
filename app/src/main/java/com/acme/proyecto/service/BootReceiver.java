@@ -1,4 +1,4 @@
-package com.acme.proyecto;
+package com.acme.proyecto.service;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -19,10 +19,6 @@ public class BootReceiver extends BroadcastReceiver {
             context.startService(intentGPSService);
             Intent intentSincroService = new Intent(context,ServicioSincroBD.class);
             context.startService(intentSincroService);
-       /* if (intent.getAction().equalsIgnoreCase(Intent.ACTION_BOOT_COMPLETED)) {
-            //here we start the service
-            Intent serviceIntent = new Intent(context, ServicioGPSResidente.class);
-            context.startService(serviceIntent);*/
         }
     }
 }

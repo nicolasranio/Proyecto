@@ -1,4 +1,4 @@
-package com.acme.proyecto;
+package com.acme.proyecto.fragment;
 
 
 import android.support.v4.app.Fragment;
@@ -8,6 +8,8 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.ViewGroup;
+
+import com.acme.proyecto.R;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -38,7 +40,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    //------------------------------------------------------------------
 
     // PagerAdapter
     public static class MyPagerAdapter extends FragmentPagerAdapter {
