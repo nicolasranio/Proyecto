@@ -90,6 +90,32 @@ public class DataAccessLocal extends SQLiteAssetHelper {
     }
 
     /**
+     * Actualiza solo la password del registro en la bd local
+     * @param password String sin encriptar
+     * @return true si se actualizo correctamente
+     */
+    public boolean actualizarPassword(String password) {
+
+        Boolean retorno = false;
+    //    String encriptedPassword = encriptar(password);
+        String queryUpdate = "UPDATE " + TABLE_NAME + " SET password='" + password + "' WHERE id='1'";
+        Log.i("SQL", queryUpdate);
+        //actualizar bd local con las variables
+        SQLiteDatabase db = getWritableDatabase();
+        if (db != null) {
+            try {
+                db.execSQL(queryUpdate);
+                db.close();
+                retorno = true;
+                //sendBroadcast();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return retorno;
+    }
+
+    /**
      * Envio un broadcast local alertando que se actualizo la BD local
      */
     private void sendBroadcast() {

@@ -9,17 +9,18 @@ public class Constantes {
     /**
      * Destino del webservice para la sincronizacion de bd
      */
-    public static String postTarget = "android_tracker/insertar_locacion.php";
+    public static String postTarget = "android_tracker/web_service/insertar_locacion.php";
+    public static String passwordSincroTarget = "android_tracker/gestion_device/sincronizar_password.php";
 
     /**
      * Intervalo de sincronizacion (milisegundos)
      */
-    public static int SYNC_INTERVAL = 250000; //25 segundos
+    public static int SYNC_INTERVAL = 1000 * 25; //25 segundos
 
     /**
      * Intervalo de trackeo (milisegundos)
      */
-    public static int GPS_UPDATE = 10000;  //10 segundos
+    public static int GPS_UPDATE = 1000 * 10;  //10 segundos
 
 
     //------Base de datos local-----------

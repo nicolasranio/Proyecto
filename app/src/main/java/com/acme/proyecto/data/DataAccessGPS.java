@@ -19,6 +19,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 public class DataAccessGPS extends SQLiteOpenHelper {
 
@@ -120,7 +121,7 @@ public class DataAccessGPS extends SQLiteOpenHelper {
             Log.i("JSON", "no hay resultados que parsear");
         }
         database.close();
-        Log.i("JSON", "Parsed: "+json);
+        Log.i("JSON", "Parsed: " + json);
         return json;
     }
 
