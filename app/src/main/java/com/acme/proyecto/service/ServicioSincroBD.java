@@ -21,6 +21,7 @@ import com.acme.proyecto.data.DataAccessGPS;
 
 import com.acme.proyecto.data.DataAccessLocal;
 import com.acme.proyecto.utils.Constantes;
+import com.acme.proyecto.utils.Hasher;
 import com.acme.proyecto.utils.VolleySingleton;
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -78,7 +79,7 @@ public class ServicioSincroBD extends Service {
         String port = data.getString("port");
         imei = data.getString("imei");
         final String postURL = "http://" + serverIp + ":" + port + "/" + Constantes.postTarget;
-        final String postPwdURL="http://" + serverIp + ":" + port + "/" + Constantes.passwordSincroTarget;
+        final String postPwdURL = "http://" + serverIp + ":" + port + "/" + Constantes.passwordSincroTarget;
         System.out.println(postURL);
 
         Timer timer = new Timer();
@@ -90,7 +91,8 @@ public class ServicioSincroBD extends Service {
                 }
                 if (getNetworkState()) {
                     try {
-                        httpSync(postURL,postPwdURL);
+                        httpSync(postURL);
+                        passwordSync(postPwdURL);
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
@@ -144,60 +146,61 @@ public class ServicioSincroBD extends Service {
      *
      * @param postURL URL del servicio web
      */
-    public void httpSync(String postURL,String postPwdURL) throws JSONException {
+    public void httpSync(String postURL) throws JSONException {
         JSONArray jsonArray;
 
         String stream = dataAccessGPS.crearJSONLocation();
-        if (stream != null) {
-             jsonArray = new JSONArray(stream);
-        }else{
-             jsonArray = new JSONArray();
-        }
+        if (stream != null) {  //si el stream es vacio => no hay locaciones para postear
+            jsonArray = new JSONArray(stream);
 
-        VolleySingleton.getInstance(getApplicationContext()).addToRequestQueue(
-                new JsonArrayRequest(
-                        Request.Method.POST,
-                        postURL,
-                        jsonArray,
-                        new Response.Listener<JSONArray>() {
+            VolleySingleton.getInstance(getApplicationContext()).addToRequestQueue(
+                    new JsonArrayRequest(
+                            Request.Method.POST,
+                            postURL,
+                            jsonArray,
+                            new Response.Listener<JSONArray>() {
 
-                            @Override
-                            public void onResponse(JSONArray response) {
-                                procesarRespuesta(response);
+                                @Override
+                                public void onResponse(JSONArray response) {
+                                    procesarRespuesta(response);
+                                }
+                            },
+                            new Response.ErrorListener() {
+
+                                @Override
+                                public void onErrorResponse(VolleyError error) {
+                                    Log.d(TAG, "Error Volley Location: " + error.getMessage());
+                                }
+
                             }
-                        },
-                        new Response.ErrorListener() {
-
-                            @Override
-                            public void onErrorResponse(VolleyError error) {
-                                Log.d(TAG, "Error Volley Location: " + error.getMessage());
-                            }
-
+                    ) {
+                        @Override
+                        public Map<String, String> getHeaders() {
+                            Map<String, String> headers = new HashMap<>();
+                            headers.put("Content-Type", "application/json; charset=utf-8");
+                            headers.put("Accept", "application/json");
+                            return headers;
                         }
-                ) {
-                    @Override
-                    public Map<String, String> getHeaders() {
-                        Map<String, String> headers = new HashMap<>();
-                        headers.put("Content-Type", "application/json; charset=utf-8");
-                        headers.put("Accept", "application/json");
-                        return headers;
+
+                        @Override
+                        public String getBodyContentType() {
+                            return "application/json; charset=utf-8" + getParamsEncoding();
+                        }
                     }
-
-                    @Override
-                    public String getBodyContentType() {
-                        return "application/json; charset=utf-8" + getParamsEncoding();
-                    }
-                }
-        );
+            );
+        }
+    }
 
 
-        //---------------Sincronizo passwords--------------------------
+    //---------------Sincronizo passwords--------------------------
+
+    public void passwordSync(String postPwdURL) throws JSONException {
 
         HashMap<String, String> map = new HashMap<>();// Mapeo previo
-        map.put("imei",imei);
+        map.put("imei", imei);
         map.put("pwd", dataAccessLocal.consultar().getString("password"));
         JSONObject jobject = new JSONObject(map);
-    //    System.out.println(jobject.toString());
+        System.out.println(jobject.toString());
 
         VolleySingleton.getInstance(getApplicationContext()).addToRequestQueue(
                 new JsonObjectRequest(
@@ -208,7 +211,8 @@ public class ServicioSincroBD extends Service {
                             @Override
                             public void onResponse(JSONObject response) {
                                 // Procesar la respuesta del servidor
-                                 procesarRespuestaPwd(response);
+                                System.out.println("Respuesta password: " + response.toString());
+                                procesarRespuestaPwd(response);
                             }
                         },
                         new Response.ErrorListener() {
@@ -236,7 +240,6 @@ public class ServicioSincroBD extends Service {
     }
 
 
-
     /**
      * Procesa el array JSON de respuesta del lado servidor
      *
@@ -245,28 +248,35 @@ public class ServicioSincroBD extends Service {
     private void procesarRespuesta(JSONArray response) {
 
         try {
-            for (int i = 0; i < response.length(); i++) {
-                JSONObject obj = (JSONObject) response.get(i);
-               // System.out.println(obj.get("id"));
-               // System.out.println(obj.get("status"));
-                dataAccessGPS.updateSyncStatus(obj.get("id").toString(), obj.get("status").toString());
-                Date ahora = new Date();
-                String syncDate = dateFormat.format(ahora);
-                String syncTime = timeFormat.format(ahora);
-                dataAccessLocal.updateLastSincro(syncDate, syncTime);
+            if (((JSONObject) response.get(0)).get("status").toString().equals(Constantes.RESPONSE_IMEI_FAIL)) {
+                //crear log en el registro
+            } else {
+                for (int i = 0; i < response.length(); i++) {
+                    JSONObject obj = (JSONObject) response.get(i);
+                    dataAccessGPS.updateSyncStatus(obj.get("id").toString(), obj.get("status").toString());
+                    Date ahora = new Date();
+                    String syncDate = dateFormat.format(ahora);
+                    String syncTime = timeFormat.format(ahora);
+                    dataAccessLocal.updateLastSincro(syncDate, syncTime);
+                }
             }
         } catch (JSONException e) {
             e.printStackTrace();
         }
     }
 
-    private void procesarRespuestaPwd(JSONObject response){
-        try{
-            if (!response.get("pwd").toString().equals("null")){
-                Log.i(TAG,"la password es diferente: nueva:"+response.get("pwd").toString());
+    private void procesarRespuestaPwd(JSONObject response) {
+        try {
+            if (!response.get("pwd").toString().equals("null")) {
+                Log.i(TAG, "la password es diferente: nueva:" + response.get("pwd").toString());
+                //escribir en el log
                 dataAccessLocal.actualizarPassword(response.get("pwd").toString());
+                Date ahora = new Date();
+                String syncDate = dateFormat.format(ahora);
+                String syncTime = timeFormat.format(ahora);
+                dataAccessLocal.updateLastSincro(syncDate, syncTime);
             }
-        }catch (JSONException e) {
+        } catch (JSONException e) {
             e.printStackTrace();
         }
 

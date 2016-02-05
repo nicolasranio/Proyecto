@@ -28,7 +28,9 @@ import com.acme.proyecto.R;
 import com.acme.proyecto.data.DataAccessLocal;
 import com.acme.proyecto.service.ServicioGPSResidente;
 import com.acme.proyecto.service.ServicioSincroBD;
+import com.acme.proyecto.utils.BCrypt;
 import com.acme.proyecto.utils.Constantes;
+import com.acme.proyecto.utils.Hasher;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -119,8 +121,8 @@ public class ConfigFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.fragment_config, container, false);
-        final Button btnLogin = (Button) rootView.findViewById(R.id.btn_login);
         final EditText etPassword = (EditText) rootView.findViewById(R.id.et_pwrd);
+        final Button btnLogin = (Button) rootView.findViewById(R.id.btn_login);
         final Button btnTest = (Button) rootView.findViewById(R.id.btn_test);
         final Button btnSincro = (Button) rootView.findViewById(R.id.btn_sincro);
         final Button btnSave = (Button) rootView.findViewById(R.id.btn_save);
@@ -134,8 +136,13 @@ public class ConfigFragment extends Fragment {
 
         btnLogin.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                CharSequence pwd = etPassword.getText();
-                if (pwd.toString().equals(dataAccessLocal.consultar().getString("password"))) {
+
+                String pass=dataAccessLocal.consultar().getString("password");
+                Log.i("Hash almacenado", pass);
+                String hash = Hasher.generateHash(etPassword.getText().toString());
+                Log.i("Hash ingresado",hash);
+
+                if (pass.equals(hash)) {
                     etName.setEnabled(true);
                     etName.setText(dataAccessLocal.consultar().getString("name"));
                     etServer.setEnabled(true);

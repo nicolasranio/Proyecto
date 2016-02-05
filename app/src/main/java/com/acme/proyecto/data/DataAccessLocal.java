@@ -10,7 +10,9 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
+import com.acme.proyecto.utils.BCrypt;
 import com.acme.proyecto.utils.Constantes;
+import com.acme.proyecto.utils.Hasher;
 import com.readystatesoftware.sqliteasset.SQLiteAssetHelper;
 
 
@@ -22,7 +24,6 @@ public class DataAccessLocal extends SQLiteAssetHelper {
     private static String TABLE_NAME = Constantes.LocalTABLE_NAME;
     private static int DB_VERSION = Constantes.LocalDB_VERSION;
     private Context context;
-
 
     private DataAccessLocal(Context context) {
 
@@ -42,6 +43,7 @@ public class DataAccessLocal extends SQLiteAssetHelper {
 
     /**
      * Consulta los datos de la bd local
+     *
      * @return Bundle del registro recogido
      */
     public Bundle consultar() {
@@ -65,6 +67,7 @@ public class DataAccessLocal extends SQLiteAssetHelper {
 
     /**
      * Actualiza el registro de la bd local
+     *
      * @param datos Bundle con los datos a actualizar
      * @return true si se actualizo correctamente
      */
@@ -91,13 +94,13 @@ public class DataAccessLocal extends SQLiteAssetHelper {
 
     /**
      * Actualiza solo la password del registro en la bd local
+     *
      * @param password String sin encriptar
      * @return true si se actualizo correctamente
      */
     public boolean actualizarPassword(String password) {
-
         Boolean retorno = false;
-    //    String encriptedPassword = encriptar(password);
+        System.out.println("Hash: "+ password);
         String queryUpdate = "UPDATE " + TABLE_NAME + " SET password='" + password + "' WHERE id='1'";
         Log.i("SQL", queryUpdate);
         //actualizar bd local con las variables
@@ -125,11 +128,12 @@ public class DataAccessLocal extends SQLiteAssetHelper {
 
     /**
      * Actualiza el registro con la fecha de la ultima actualizacion
+     *
      * @param locdate fecha de la actualizacion
      * @param loctime hora de la actualizacion
      */
-    public void updateLastSincro(String locdate,String loctime) {
-        String parsedDate = locdate+" "+ loctime;
+    public void updateLastSincro(String locdate, String loctime) {
+        String parsedDate = locdate + " " + loctime;
         String queryUpdate = "UPDATE " + TABLE_NAME + " SET lastSincro ='" + parsedDate + "' WHERE id='1'";
         SQLiteDatabase db = getWritableDatabase();
         if (db != null) {

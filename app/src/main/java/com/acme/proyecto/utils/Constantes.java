@@ -41,11 +41,17 @@ public class Constantes {
 
     public static String RESPONSE_OK = "OK";
     public static String RESPONSE_FAIL = "FAIL";
+    public static String RESPONSE_IMEI_FAIL = "IMEI_NOT_EXIST";
 
     //--------UI--------------------
 
     public static String PING_OK = "Conexion exitosa!";
     public static String PING_FAIL = "Error! Servidor no alcanzable ";
+
+    //-----Hashing------------------
+
+    public static String SALT = "Ui,Lc6.3=2*c";
+    public static String ADDEDHASH = "$2a$10$";
 
 }
 
