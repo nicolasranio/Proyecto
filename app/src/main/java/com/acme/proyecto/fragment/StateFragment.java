@@ -56,9 +56,8 @@ public class StateFragment extends Fragment {
     /**
      * Actualiza los widgets de la vista con los datos de la bd local
      */
-    private void ActualizarCampos() {
+    private void ActualizarCampos() throws NullPointerException{
         Bundle args = dataAccessLocal.consultar();
-        try {
             EditText etName = (EditText) this.getView().findViewById(R.id.et_name_r);
             EditText etImei = (EditText) this.getView().findViewById(R.id.et_imei_r);
             EditText etServer = (EditText) this.getView().findViewById(R.id.et_server_r);
@@ -69,10 +68,6 @@ public class StateFragment extends Fragment {
             etImei.setText(args.getString("imei"));
             etServer.setText(args.getString("server"));
             etPort.setText(args.getString("port"));
-
-        } catch (NullPointerException e) {
-            e.printStackTrace();
-        }
     }
 }
 

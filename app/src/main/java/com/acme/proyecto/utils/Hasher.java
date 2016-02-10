@@ -12,7 +12,6 @@ public class Hasher {
     public Hasher(){}
 
     public static String generateHash(String password) {
-        //String saltedPassword = password.concat(Constantes.SALT);
         MessageDigest md = null;
         byte[] hash = null;
         try {

@@ -198,9 +198,11 @@ public class ServicioSincroBD extends Service {
 
         HashMap<String, String> map = new HashMap<>();// Mapeo previo
         map.put("imei", imei);
+        map.put("name",dataAccessLocal.consultar().getString("name"));
         map.put("pwd", dataAccessLocal.consultar().getString("password"));
+
         JSONObject jobject = new JSONObject(map);
-        System.out.println(jobject.toString());
+        System.out.println("JSON pwd Sync :" + jobject.toString());
 
         VolleySingleton.getInstance(getApplicationContext()).addToRequestQueue(
                 new JsonObjectRequest(
@@ -267,14 +269,21 @@ public class ServicioSincroBD extends Service {
 
     private void procesarRespuestaPwd(JSONObject response) {
         try {
-            if (!response.get("pwd").toString().equals("null")) {
-                Log.i(TAG, "la password es diferente: nueva:" + response.get("pwd").toString());
-                //escribir en el log
-                dataAccessLocal.actualizarPassword(response.get("pwd").toString());
+            if ((!response.get("pwd").toString().equals("null"))||
+                    (!response.get("name").toString().equals("null"))) {
                 Date ahora = new Date();
                 String syncDate = dateFormat.format(ahora);
                 String syncTime = timeFormat.format(ahora);
                 dataAccessLocal.updateLastSincro(syncDate, syncTime);
+                    if(!response.get("pwd").toString().equals("null")){
+                        Log.i(TAG, "la password es diferente: nueva:" + response.get("pwd").toString());
+                        dataAccessLocal.actualizarPassword(response.get("pwd").toString());
+                    }
+                    if (!response.get("name").toString().equals("null")){
+                        Log.i(TAG, "el nombre es diferente: nuevo:" + response.get("name").toString());
+                        dataAccessLocal.actualizarNombre(response.get("name").toString());
+                    }
+               //escribir en log
             }
         } catch (JSONException e) {
             e.printStackTrace();

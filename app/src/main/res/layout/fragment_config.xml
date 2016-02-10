@@ -7,44 +7,15 @@
 
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:padding="10dp">
-
-        <TextView
-            android:id="@+id/tv_pwrd"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:text="@string/tv_pwrd" />
-
-        <EditText
-            android:id="@+id/et_pwrd"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignLeft="@id/tv_pwrd"
-            android:layout_below="@id/tv_pwrd"
-            android:inputType="textPassword"
-            android:maxLength="10"
-            android:focusable="true"
-            />
-
-        <Button
-            android:id="@+id/btn_login"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignRight="@id/et_pwrd"
-            android:layout_below="@id/et_pwrd"
-            android:text="@string/btn_login"
-            android:enabled="true"
-            android:clickable="true" />
 
         <TextView
             android:id="@+id/tv_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignLeft="@id/tv_pwrd"
-            android:layout_below="@id/btn_login"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
             android:text="@string/tv_name"
             android:layout_marginTop="15dp"/>
 
@@ -52,7 +23,7 @@
             android:id="@+id/et_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignLeft="@id/tv_pwrd"
+            android:layout_alignLeft="@id/tv_name"
             android:layout_below="@id/tv_name"
             android:inputType="text"
             android:editable="false"
@@ -62,7 +33,7 @@
             android:id="@+id/tv_server"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignLeft="@id/tv_pwrd"
+            android:layout_alignLeft="@id/tv_name"
             android:layout_below="@id/et_name"
             android:paddingTop="10dp"
             android:text="@string/tv_server" />
@@ -71,7 +42,7 @@
             android:id="@+id/et_server"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignLeft="@id/tv_pwrd"
+            android:layout_alignLeft="@id/tv_name"
             android:layout_below="@id/tv_server"
             android:editable="false"
             android:paddingBottom="10dp"
@@ -82,7 +53,7 @@
             android:id="@+id/tv_puerto"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignLeft="@id/tv_pwrd"
+            android:layout_alignLeft="@id/tv_name"
             android:layout_below="@id/et_server"
             android:paddingTop="10dp"
             android:text="@string/tv_puerto" />
@@ -91,7 +62,7 @@
             android:id="@+id/et_puerto"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_alignLeft="@id/tv_pwrd"
+            android:layout_alignLeft="@id/tv_name"
             android:layout_below="@id/tv_puerto"
             android:editable="false"
             android:paddingBottom="10dp"
@@ -101,7 +72,7 @@
             android:id="@+id/btn_test"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignLeft="@id/tv_pwrd"
+            android:layout_alignLeft="@id/tv_name"
             android:layout_below="@+id/et_puerto"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="5dp"
@@ -113,7 +84,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/et_server"
             android:layout_toRightOf="@id/btn_test"
-            android:layout_alignRight="@id/et_pwrd"
+            android:layout_alignRight="@id/et_name"
             android:layout_alignTop="@id/btn_test"
             android:src="@drawable/ic_action_cancel"
             android:visibility="invisible"
@@ -123,7 +94,7 @@
             android:id="@+id/btn_sincro"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignLeft="@id/tv_pwrd"
+            android:layout_alignLeft="@id/tv_name"
             android:layout_alignRight="@id/btn_test"
             android:layout_below="@id/btn_test"
             android:text="@string/btn_sincro" />
@@ -134,7 +105,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/btn_test"
             android:layout_toRightOf="@id/btn_sincro"
-            android:layout_alignRight="@id/et_pwrd"
+            android:layout_alignRight="@id/et_name"
             android:layout_alignLeft="@id/img_test"
             android:src="@drawable/blank"
             android:visibility="invisible"
@@ -150,8 +121,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="5dp"
-            android:layout_alignLeft="@id/tv_pwrd"
-            android:layout_alignRight="@id/et_pwrd"
+            android:layout_alignLeft="@id/tv_name"
+            android:layout_alignRight="@id/et_name"
             android:layout_below="@id/btn_sincro"/>
 
         <Switch
@@ -164,8 +135,8 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="5dp"
-            android:layout_alignLeft="@id/tv_pwrd"
-            android:layout_alignRight="@id/et_pwrd"
+            android:layout_alignLeft="@id/tv_name"
+            android:layout_alignRight="@id/et_name"
             android:layout_below="@id/sw_service_gps"/>
 
         <Button
@@ -173,8 +144,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/sw_service_sincro"
-            android:layout_alignRight="@id/et_pwrd"
-            android:layout_alignLeft="@id/et_pwrd"
+            android:layout_alignRight="@id/et_name"
+            android:layout_alignLeft="@id/et_name"
             android:layout_marginTop="15dp"
             android:text="@string/btn_guardar" />
     </RelativeLayout>

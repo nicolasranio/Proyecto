@@ -1,6 +1,7 @@
 package com.acme.proyecto.fragment;
 
 import android.app.ActivityManager;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -28,8 +29,8 @@ import com.acme.proyecto.R;
 import com.acme.proyecto.data.DataAccessLocal;
 import com.acme.proyecto.service.ServicioGPSResidente;
 import com.acme.proyecto.service.ServicioSincroBD;
-import com.acme.proyecto.utils.BCrypt;
 import com.acme.proyecto.utils.Constantes;
+import com.acme.proyecto.utils.CustomAlertDialogBuilder;
 import com.acme.proyecto.utils.Hasher;
 
 import java.io.BufferedReader;
@@ -45,6 +46,7 @@ public class ConfigFragment extends Fragment {
     private boolean estadoServicioSincro = false;
     private boolean swGPSOn = false;
     private boolean swSincroOn = false;
+    private boolean logged = false;
 
     // newInstance constructor for creating fragment with arguments
     public static ConfigFragment newInstance() {
@@ -71,29 +73,105 @@ public class ConfigFragment extends Fragment {
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
-        inicializar();
+        inicializar(0);
         try {
             actualizarCampos();
         }catch (NullPointerException e ){e.printStackTrace();}
     }
 
+
+    @Override
+    public void setUserVisibleHint(boolean visible){
+        super.setUserVisibleHint(visible);
+        if (visible && isResumed() && (!logged)){
+            CustomAlertDialogBuilder dialogBuilder = new CustomAlertDialogBuilder(getContext());
+            LayoutInflater inflater = LayoutInflater.from(getContext());
+            final View dialogView = inflater.inflate(R.layout.login_layout, null);
+            dialogBuilder.setView(dialogView);
+            final EditText etPass = (EditText) dialogView.findViewById(R.id.txtPassword);
+
+            dialogBuilder.setIcon(R.drawable.ic_action_key);
+            dialogBuilder.setTitle("Login");
+            dialogBuilder.setMessage("Ingrese password de admin");
+
+            dialogBuilder.setPositiveButton("Login", new DialogInterface.OnClickListener() {
+
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    String pass = dataAccessLocal.consultar().getString("password");
+                    Log.i("Hash almacenado", pass);
+                    String hash = Hasher.generateHash(etPass.getText().toString());
+                    Log.i("Hash ingresado", hash);
+                    if (pass.equals(hash)) {
+                        dialog.dismiss();
+                        logged = true;
+                        inicializar(1);
+                    } else {
+                        etPass.setText("");
+                        Toast.makeText(getContext(), "Password incorrecta", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+            // (optional) set whether to dismiss dialog when touching outside
+            dialogBuilder.setCanceledOnTouchOutside(false);
+            dialogBuilder.show();
+        }
+    }
+
+
     /**
-     * Inicializa el estado de los widgets
+     * Inicializa el estado de los widgets dependiendo el estado del flag
+     * @param flag 0 = seteo inicial; 1 = seteo post login
      */
-    public void inicializar() {
+    public void inicializar(int flag) {
         if (this.isVisible()) { //si el fragment esta activo
             try {
-                EditText pwd = (EditText) this.getView().findViewById(R.id.et_pwrd);
-                pwd.setText("");
-                this.getView().findViewById(R.id.btn_test).setEnabled(false);
-                this.getView().findViewById(R.id.btn_sincro).setEnabled(false);
-                this.getView().findViewById(R.id.btn_save).setEnabled(false);
-                this.getView().findViewById(R.id.et_name).setEnabled(false);
-                this.getView().findViewById(R.id.et_server).setEnabled(false);
-                this.getView().findViewById(R.id.sw_service_gps).setEnabled(false);
-                this.getView().findViewById(R.id.sw_service_sincro).setEnabled(false);
-                this.getView().findViewById(R.id.et_puerto).setEnabled(false);
-                this.getView().findViewById(R.id.et_pwrd).requestFocus();
+                final Button btnTest = (Button) this.getView().findViewById(R.id.btn_test);
+                final Button btnSincro = (Button) this.getView().findViewById(R.id.btn_sincro);
+                final Button btnSave = (Button) this.getView().findViewById(R.id.btn_save);
+                final EditText etName = (EditText) this.getView().findViewById(R.id.et_name);
+                final EditText etServer = (EditText) this.getView().findViewById(R.id.et_server);
+                final EditText etPuerto = (EditText) this.getView().findViewById(R.id.et_puerto);
+                final Switch swServiceGPS = (Switch) this.getView().findViewById(R.id.sw_service_gps);
+                final Switch swServiceSincro = (Switch) this.getView().findViewById(R.id.sw_service_sincro);
+
+                switch (flag){
+                    case 0:{
+                        btnTest.setEnabled(false);
+                        btnSincro.setEnabled(false);
+                        btnSave.setEnabled(false);
+                        etName.setEnabled(false);
+                        etServer.setEnabled(false);
+                        swServiceGPS.setEnabled(false);
+                        swServiceSincro.setEnabled(false);
+                        etPuerto.setEnabled(false);
+                        break;
+                    }
+                    case 1:{
+                        etName.setEnabled(true);
+                        etServer.setEnabled(true);
+                        etPuerto.setEnabled(true);
+                        btnTest.setEnabled(true);
+                        btnSincro.setEnabled(true);
+                        btnSave.setEnabled(true);
+                        actualizarCampos();
+                        //inicializo estado Switch GPS
+                        estadoServicioGPS = estadoServicio(GPS_SERVICE_NAME);  //actualizo estado del servicio
+                        swServiceGPS.setEnabled(true);
+                        swGPSOn = true;  //cambio valor para usarlo en el cond del switch handler
+                        swServiceGPS.setChecked(estadoServicioGPS);
+                        //inicializo estado Switch Sincro
+                        estadoServicioSincro = estadoServicio(SINCRO_SERVICE_NAME);
+                        swServiceSincro.setEnabled(true);
+                        swSincroOn = true;
+                        swServiceSincro.setChecked(estadoServicioSincro);
+                        break;
+                    }
+                    case 2:{
+
+                        break;
+                    }
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -121,8 +199,8 @@ public class ConfigFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.fragment_config, container, false);
-        final EditText etPassword = (EditText) rootView.findViewById(R.id.et_pwrd);
-        final Button btnLogin = (Button) rootView.findViewById(R.id.btn_login);
+       // final EditText etPassword = (EditText) rootView.findViewById(R.id.et_pwrd);
+       // final Button btnLogin = (Button) rootView.findViewById(R.id.btn_login);
         final Button btnTest = (Button) rootView.findViewById(R.id.btn_test);
         final Button btnSincro = (Button) rootView.findViewById(R.id.btn_sincro);
         final Button btnSave = (Button) rootView.findViewById(R.id.btn_save);
@@ -132,9 +210,10 @@ public class ConfigFragment extends Fragment {
         final Switch swServiceGPS = (Switch) rootView.findViewById(R.id.sw_service_gps);
         final Switch swServiceSincro = (Switch) rootView.findViewById(R.id.sw_service_sincro);
 
+
         //-----------   Button Handlers   --------------------
 
-        btnLogin.setOnClickListener(new View.OnClickListener() {
+    /*    btnLogin.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
 
                 String pass=dataAccessLocal.consultar().getString("password");
@@ -169,7 +248,7 @@ public class ConfigFragment extends Fragment {
                 }
             }
         });
-
+*/
 
         //-----------------------------
 
@@ -355,14 +434,15 @@ public class ConfigFragment extends Fragment {
                                         msj = "Se produjo un error\n al actualizar los dataAccessLocal";
                                     }
                                 }
-                                inicializar();
+                                logged=false;
+                                inicializar(0);
                                 Toast.makeText(getContext(), msj, Toast.LENGTH_SHORT).show();
                             }
                         })
                         .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
                             public void onClick(DialogInterface dialog, int which) {
                                 actualizarCampos();
-                                inicializar();
+                                inicializar(0);
                             }
                         })
                         .show();

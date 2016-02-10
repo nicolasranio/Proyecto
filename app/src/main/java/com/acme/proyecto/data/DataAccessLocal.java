@@ -7,12 +7,9 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
-import android.telephony.TelephonyManager;
 import android.util.Log;
 
-import com.acme.proyecto.utils.BCrypt;
 import com.acme.proyecto.utils.Constantes;
-import com.acme.proyecto.utils.Hasher;
 import com.readystatesoftware.sqliteasset.SQLiteAssetHelper;
 
 
@@ -117,6 +114,35 @@ public class DataAccessLocal extends SQLiteAssetHelper {
         }
         return retorno;
     }
+
+
+    /**
+     * Actualiza el nombre del equipo en la bd local
+     *
+     * @param nombre String nombre
+     * @return true si se actualizo correctamente
+     */
+    public boolean actualizarNombre(String nombre) {
+        Boolean retorno = false;
+        String queryUpdate = "UPDATE " + TABLE_NAME + " SET nombre='" + nombre + "' WHERE id='1'";
+        Log.i("SQL", queryUpdate);
+        //actualizar bd local con las variables
+        SQLiteDatabase db = getWritableDatabase();
+        if (db != null) {
+            try {
+                db.execSQL(queryUpdate);
+                db.close();
+                retorno = true;
+                sendBroadcast();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+        return retorno;
+    }
+
+
+
 
     /**
      * Envio un broadcast local alertando que se actualizo la BD local
