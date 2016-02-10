@@ -12,6 +12,7 @@ public class Constantes {
     public static String postTarget = "android_tracker/web_service/insertar_locacion.php";
     public static String passwordSincroTarget = "android_tracker/gestion_device/sincronizar_password.php";
 
+    public static String GPS_SERVICE_NAME = "com.acme.proyecto.service.ServicioGPSResidente";
     /**
      * Intervalo de sincronizacion (milisegundos)
      */
@@ -22,6 +23,7 @@ public class Constantes {
      */
     public static int GPS_UPDATE = 1000 * 10;  //10 segundos
 
+    public static String SINCRO_SERVICE_NAME = "com.acme.proyecto.service.ServicioSincroBD";
 
     //------Base de datos local-----------
 
@@ -52,6 +54,13 @@ public class Constantes {
 
     public static String SALT = "Ui,Lc6.3=2*c";
     public static String ADDEDHASH = "$2a$10$";
+
+    //-----Mensajes-----------------
+
+    public static String msjUpdate = "Datos en BD local actualizados";
+    public static String msjUpdateName = "Nombre de dispositivo en BD local actualizado";
+    public static String msjUpdatePassword = "Password de dispositivo en BD local actualizado";
+
 
 }
 

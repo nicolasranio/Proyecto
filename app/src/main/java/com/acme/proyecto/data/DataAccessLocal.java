@@ -9,23 +9,28 @@ import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.acme.proyecto.R;
 import com.acme.proyecto.utils.Constantes;
+import com.acme.proyecto.utils.LogFile;
 import com.readystatesoftware.sqliteasset.SQLiteAssetHelper;
 
 
 public class DataAccessLocal extends SQLiteAssetHelper {
 
     private static DataAccessLocal bdInstance;
+    private static final String TAG = DataAccessLocal.class.getSimpleName();
 
     private static String DB_NAME = Constantes.LocalDB_NAME;
     private static String TABLE_NAME = Constantes.LocalTABLE_NAME;
     private static int DB_VERSION = Constantes.LocalDB_VERSION;
     private Context context;
+    LogFile logFile;
 
     private DataAccessLocal(Context context) {
 
         super(context, DB_NAME, null, DB_VERSION);
         this.context = context;
+        logFile=new LogFile(context,context.getString(R.string.app_name));
     }
 
 
@@ -83,9 +88,11 @@ public class DataAccessLocal extends SQLiteAssetHelper {
                 retorno = true;
                 sendBroadcast();
             } catch (SQLException e) {
-                e.printStackTrace();
+                logFile.appendLog(TAG, e.getMessage());
+
             }
         }
+        logFile.appendLog(TAG,Constantes.msjUpdate);
         return retorno;
     }
 
@@ -109,9 +116,10 @@ public class DataAccessLocal extends SQLiteAssetHelper {
                 retorno = true;
                 //sendBroadcast();
             } catch (SQLException e) {
-                e.printStackTrace();
+                logFile.appendLog(TAG, e.getMessage());
             }
         }
+        logFile.appendLog(TAG,Constantes.msjUpdatePassword);
         return retorno;
     }
 
@@ -135,13 +143,12 @@ public class DataAccessLocal extends SQLiteAssetHelper {
                 retorno = true;
                 sendBroadcast();
             } catch (SQLException e) {
-                e.printStackTrace();
+                logFile.appendLog(TAG, e.getMessage());
             }
         }
+        logFile.appendLog(TAG,Constantes.msjUpdateName);
         return retorno;
     }
-
-
 
 
     /**
@@ -168,7 +175,7 @@ public class DataAccessLocal extends SQLiteAssetHelper {
                 db.close();
                 sendBroadcast();
             } catch (SQLException e) {
-                e.printStackTrace();
+                logFile.appendLog(TAG,e.getMessage());
             }
         }
     }

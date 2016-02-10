@@ -11,14 +11,17 @@ import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.acme.proyecto.R;
 import com.acme.proyecto.data.DataAccessGPS;
 import com.acme.proyecto.utils.Constantes;
+import com.acme.proyecto.utils.LogFile;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
+import java.io.File;
 import java.text.DateFormat;
 import java.util.Date;
 
@@ -35,6 +38,7 @@ public class ServicioGPSResidente extends Service implements GoogleApiClient.Con
     private DataAccessGPS dataAccessGPS;
     private final DateFormat timeFormat = DateFormat.getTimeInstance(); //new SimpleDateFormat("HH/mm/ss");
     private final DateFormat dateFormat = DateFormat.getDateInstance(); //new SimpleDateFormat("dd/MM/yyyy");
+    private static LogFile logFile;
 
     public ServicioGPSResidente() {
     }
@@ -47,6 +51,7 @@ public class ServicioGPSResidente extends Service implements GoogleApiClient.Con
         IMEI_PHONE = mngr.getDeviceId();
         PHONE_STATE = mngr.getNetworkOperator();
         dataAccessGPS = DataAccessGPS.getInstance(getApplicationContext());
+        logFile=new LogFile(getApplicationContext(),getString(R.string.app_name));
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(LocationServices.API)
@@ -151,12 +156,13 @@ public class ServicioGPSResidente extends Service implements GoogleApiClient.Con
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         stopLocationUpdates();
         stopSelf();
-        Log.i("API", "GoogleApiClient connection has failed");
+        logFile.appendLog("Google Location Services", "GoogleApiClient connection has failed");
     }
 
     private void stopLocationUpdates() {
         if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
             mGoogleApiClient.disconnect();
+            logFile.appendLog("Google Location Services","GoogleApiClient has been stoped receiving locations");
         }
     }
 }

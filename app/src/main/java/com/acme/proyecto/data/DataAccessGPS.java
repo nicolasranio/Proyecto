@@ -9,7 +9,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.acme.proyecto.R;
 import com.acme.proyecto.utils.Constantes;
+import com.acme.proyecto.utils.LogFile;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -24,10 +26,12 @@ import java.util.Map;
 public class DataAccessGPS extends SQLiteOpenHelper {
 
     private static DataAccessGPS bdInstance;
+    private static final String TAG = DataAccessLocal.class.getSimpleName();
 
     private static String DB_NAME = Constantes.TrackingDB_NAME;
     private static int DB_VERSION = Constantes.TrackingDB_VERSION;
     private String TABLE_NAME = Constantes.TrackingTABLE_NAME;
+    LogFile logFile;
 
     //Flags estado sincronizacion
     private final int SINCRO_PEND = Constantes.SINCRO_PEND;
@@ -37,6 +41,7 @@ public class DataAccessGPS extends SQLiteOpenHelper {
     private DataAccessGPS(Context context) {
 
         super(context, DB_NAME, null, DB_VERSION);
+        logFile = new LogFile(context,context.getString(R.string.app_name));
     }
 
     //patron Singleton
@@ -79,7 +84,7 @@ public class DataAccessGPS extends SQLiteOpenHelper {
                 db.execSQL(queryInsert);
                 db.close();
             } catch (SQLException e) {
-                e.printStackTrace();
+                logFile.appendLog(TAG,e.getMessage());
             }
         }
     }

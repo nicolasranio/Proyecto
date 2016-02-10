@@ -13,8 +13,12 @@
     </style>
 
     <style name="PauseDialogAnimation">
-        <item name="android:windowEnterAnimation">@animator/fadein</item>
-        <item name="android:windowExitAnimation">@animator/fadeout</item>
+        <item name="android:windowEnterAnimation">@anim/fadein</item>
+        <item name="android:windowExitAnimation">@anim/fadeout</item>
+    </style>
+
+    <style name="dialog_vibration">
+        <item name="android:windowEnterAnimation">@anim/vibration</item>
     </style>
 
 </resources>

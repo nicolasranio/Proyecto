@@ -22,6 +22,7 @@ import com.acme.proyecto.data.DataAccessGPS;
 import com.acme.proyecto.data.DataAccessLocal;
 import com.acme.proyecto.utils.Constantes;
 import com.acme.proyecto.utils.Hasher;
+import com.acme.proyecto.utils.LogFile;
 import com.acme.proyecto.utils.VolleySingleton;
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -56,8 +57,8 @@ public class ServicioSincroBD extends Service {
     private final DateFormat timeFormat = DateFormat.getTimeInstance(); //new SimpleDateFormat("HH/mm/ss");
     private final DateFormat dateFormat = DateFormat.getDateInstance(); //new SimpleDateFormat("dd/MM/yyyy");
     private String imei;
+    private static LogFile logFile;
 
-    //poner en cada json el imei y la password de admin para que se acepte la coordenada
 
     public ServicioSincroBD() {
     }
@@ -68,6 +69,7 @@ public class ServicioSincroBD extends Service {
         //Log.d("SERVICESincro", "Servicio sincro creado");
         dataAccessGPS = DataAccessGPS.getInstance(getApplicationContext());
         dataAccessLocal = DataAccessLocal.getInstance(getApplicationContext());
+        logFile=new LogFile(getApplicationContext(),getString(R.string.app_name));
     }
 
     @Override
@@ -80,7 +82,6 @@ public class ServicioSincroBD extends Service {
         imei = data.getString("imei");
         final String postURL = "http://" + serverIp + ":" + port + "/" + Constantes.postTarget;
         final String postPwdURL = "http://" + serverIp + ":" + port + "/" + Constantes.passwordSincroTarget;
-        System.out.println(postURL);
 
         Timer timer = new Timer();
         timerTask = new TimerTask() {
@@ -120,17 +121,7 @@ public class ServicioSincroBD extends Service {
 
 
     /**
-     * Fuerza a que se inicie la tarea, saltando TimerTask
-     */
-    public void forceSync() {
-        //forzar a que comienze la tarea. Realizar la llamada desde el boton forzar sincronizacion
-        //httpSync();
-    }
-
-
-    /**
      * Valida conexion a internet
-     *
      * @return true si hay conexion a internet
      */
     private boolean getNetworkState() {
@@ -169,9 +160,9 @@ public class ServicioSincroBD extends Service {
 
                                 @Override
                                 public void onErrorResponse(VolleyError error) {
-                                    Log.d(TAG, "Error Volley Location: " + error.getMessage());
+                                    Log.d(TAG, "Error Volley LocationUpdate: " + error.getMessage());
+                                    logFile.appendLog(TAG,error.getMessage());
                                 }
-
                             }
                     ) {
                         @Override
@@ -202,7 +193,6 @@ public class ServicioSincroBD extends Service {
         map.put("pwd", dataAccessLocal.consultar().getString("password"));
 
         JSONObject jobject = new JSONObject(map);
-        System.out.println("JSON pwd Sync :" + jobject.toString());
 
         VolleySingleton.getInstance(getApplicationContext()).addToRequestQueue(
                 new JsonObjectRequest(
@@ -213,14 +203,14 @@ public class ServicioSincroBD extends Service {
                             @Override
                             public void onResponse(JSONObject response) {
                                 // Procesar la respuesta del servidor
-                                System.out.println("Respuesta password: " + response.toString());
                                 procesarRespuestaPwd(response);
                             }
                         },
                         new Response.ErrorListener() {
                             @Override
                             public void onErrorResponse(VolleyError error) {
-                                Log.d(TAG, "Error Volley Password: " + error.getMessage());
+                                Log.d(TAG, "Error Volley PasswordUpdate: " + error.getMessage());
+                                logFile.appendLog(TAG,error.getMessage());
                             }
                         }
 
@@ -251,7 +241,7 @@ public class ServicioSincroBD extends Service {
 
         try {
             if (((JSONObject) response.get(0)).get("status").toString().equals(Constantes.RESPONSE_IMEI_FAIL)) {
-                //crear log en el registro
+                logFile.appendLog(TAG,"Respuesta del servidor: " + Constantes.RESPONSE_IMEI_FAIL);
             } else {
                 for (int i = 0; i < response.length(); i++) {
                     JSONObject obj = (JSONObject) response.get(i);
@@ -260,6 +250,7 @@ public class ServicioSincroBD extends Service {
                     String syncDate = dateFormat.format(ahora);
                     String syncTime = timeFormat.format(ahora);
                     dataAccessLocal.updateLastSincro(syncDate, syncTime);
+
                 }
             }
         } catch (JSONException e) {
@@ -283,7 +274,6 @@ public class ServicioSincroBD extends Service {
                         Log.i(TAG, "el nombre es diferente: nuevo:" + response.get("name").toString());
                         dataAccessLocal.actualizarNombre(response.get("name").toString());
                     }
-               //escribir en log
             }
         } catch (JSONException e) {
             e.printStackTrace();

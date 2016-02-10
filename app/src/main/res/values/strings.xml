@@ -9,7 +9,7 @@
     <string name="tv_pwrd">Password</string>
     <string name="btn_login">Login</string>
     <string name="btn_test">Test conectividad</string>
-    <string name="btn_sincro">Sincronizar DB</string>
+    <string name="btn_viewlog">Ver Log</string>
     <string name="sw_service_gps">Servicio GPS</string>
     <string name="sw_service_sincro">Servicio sincronizacion remota</string>
     <string name="btn_guardar">Guardar</string>
