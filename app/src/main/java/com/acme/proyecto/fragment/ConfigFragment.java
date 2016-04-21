@@ -52,12 +52,12 @@ public class ConfigFragment extends Fragment {
     private boolean logged = false;
     private LogFile logfile;
 
-    // newInstance constructor for creating fragment with arguments
+
     public static ConfigFragment newInstance() {
         return new ConfigFragment();
     }
 
-    // Store instance variables based on arguments passed
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -402,7 +402,8 @@ public class ConfigFragment extends Fragment {
                                     args.putString("server", etServer.getText().toString());
                                     args.putString("port", etPuerto.getText().toString());
                                     args.putString("imei", IMEI_PHONE);
-                                    if (dataAccessLocal.actualizar(args)) {
+
+                                    if (dataAccessLocal.actualizarLocal(args)) {
                                         actualizarCampos();
                                         msj = "Actualizacion correcta";
                                     } else {
@@ -432,6 +433,8 @@ public class ConfigFragment extends Fragment {
 
     /**
      * Actualiza los widgets de la vista con los datos de la bd local
+     *
+     * @throws NullPointerException
      */
     private void actualizarCampos() throws NullPointerException {
 

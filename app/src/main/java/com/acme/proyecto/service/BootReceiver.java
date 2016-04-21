@@ -5,9 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.widget.Toast;
 
-/**
- * Created by nico on 08/01/2016.
- */
 public class BootReceiver extends BroadcastReceiver {
 
 

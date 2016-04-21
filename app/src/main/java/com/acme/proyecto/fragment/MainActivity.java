@@ -41,7 +41,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-    // PagerAdapter
+    /**
+     * Clase privada pagerAdapter
+     */
     public static class MyPagerAdapter extends FragmentPagerAdapter {
         private static int NUM_ITEMS = 2;
 

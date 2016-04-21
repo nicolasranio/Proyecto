@@ -7,7 +7,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.acme.proyecto.R;
 import com.acme.proyecto.utils.Constantes;
@@ -15,13 +14,7 @@ import com.acme.proyecto.utils.LogFile;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 public class DataAccessGPS extends SQLiteOpenHelper {
 
@@ -44,7 +37,11 @@ public class DataAccessGPS extends SQLiteOpenHelper {
         logFile = new LogFile(context,context.getString(R.string.app_name));
     }
 
-    //patron Singleton
+    /**
+     *
+     * @param context contexto
+     * @return DataAccessGPS instancia Singleton
+     */
     public static synchronized DataAccessGPS getInstance(Context context) {
 
         if (bdInstance == null) {
@@ -71,6 +68,7 @@ public class DataAccessGPS extends SQLiteOpenHelper {
 
     /**
      * Inserta un nuevo registro de coordenada en la tabla
+     *
      * @param datos Bundle con los datos de la coordenada
      */
     public void nuevaCoordenada(Bundle datos) {
@@ -91,6 +89,7 @@ public class DataAccessGPS extends SQLiteOpenHelper {
 
     /**
      * Devuelve todos los registros de la tabla
+     *
      * @return Cursor con los registros
      */
     public Cursor getAllLocations() {
@@ -103,6 +102,7 @@ public class DataAccessGPS extends SQLiteOpenHelper {
 
     /**
      * Crea un array JSON con los registros pendientes de sincronizacion
+     *
      * @return String JSON si hay pendientes, null si no hay pendientes.
      */
     public String crearJSONLocation() {
@@ -133,10 +133,11 @@ public class DataAccessGPS extends SQLiteOpenHelper {
 
     /**
      * Comprueba registros pendientes de sincronizacion
+     *
      * @return True si existen registros sin sincronizar
      */
     public boolean getSyncStatus() {
-        int cont = 0;
+        int cont;
         String selectQuery = "SELECT * FROM " + TABLE_NAME + " WHERE update_status = '" + SINCRO_PEND + "'";
         Log.i("getSyncStatus", selectQuery);
         SQLiteDatabase database = this.getWritableDatabase();
@@ -150,6 +151,7 @@ public class DataAccessGPS extends SQLiteOpenHelper {
 
     /**
      * Actualiza en la tabla el estado del registro sincronizado
+     *
      * @param id del registro actualizado
      * @param status de la actualizacion (correcta o fallida)
      */
@@ -176,7 +178,10 @@ public class DataAccessGPS extends SQLiteOpenHelper {
     }
 
     /*------------------------------------------------------------*/
-    //clase privada para generar objetos del tipo Location
+
+    /**
+     * Clase privada para generar objetos Location
+     */
     private class Location {
 
         int id;

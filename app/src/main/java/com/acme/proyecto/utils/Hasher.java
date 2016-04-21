@@ -1,8 +1,5 @@
 package com.acme.proyecto.utils;
 
-import android.provider.ContactsContract;
-import android.util.Base64;
-
 import java.io.UnsupportedEncodingException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -11,8 +8,13 @@ public class Hasher {
 
     public Hasher(){}
 
+    /**
+     *
+     * @param password password en formato plano
+     * @return password encriptada en SHA-256
+     */
     public static String generateHash(String password) {
-        MessageDigest md = null;
+        MessageDigest md;
         byte[] hash = null;
         try {
             md = MessageDigest.getInstance("SHA-256");

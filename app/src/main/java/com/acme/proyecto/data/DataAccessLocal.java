@@ -34,7 +34,11 @@ public class DataAccessLocal extends SQLiteAssetHelper {
     }
 
 
-    //implementacion de Singleton
+    /**
+     *
+     * @param context contexto
+     * @return DataAccessLocal instancia Singleton
+     */
     public static synchronized DataAccessLocal getInstance(Context context) {
 
         if (bdInstance == null) {
@@ -51,7 +55,7 @@ public class DataAccessLocal extends SQLiteAssetHelper {
     public Bundle consultar() {
         Bundle arg = new Bundle();
         SQLiteDatabase db = this.getReadableDatabase();
-        String[] campos = new String[]{"password", "nombre", "imei", "server", "port", "lastsincro"};
+        String[] campos = new String[]{"password", "nombre", "imei", "server", "port", "lastsincro","gpsscope","syncroscope","estado"};
         Cursor cur = db.query(TABLE_NAME, campos, null, null, null, null, null);
         //   if (cur==null) Log.i("Cursor","Cursor nulo");
         if (cur.moveToFirst()) {
@@ -61,19 +65,22 @@ public class DataAccessLocal extends SQLiteAssetHelper {
             arg.putString("server", cur.getString(3));
             arg.putString("port", cur.getString(4));
             arg.putString("lastsincro", cur.getString(5));
+            arg.putString("gpsInterval",cur.getString(6));
+            arg.putString("syncInterval",cur.getString(7));
+            arg.putInt("estado",cur.getInt(8));
         }
         cur.close();
         db.close();
         return arg;
     }
 
+
     /**
-     * Actualiza el registro de la bd local
      *
-     * @param datos Bundle con los datos a actualizar
-     * @return true si se actualizo correctamente
+     * @param datos bundle con datos de configuracion
+     * @return true o false
      */
-    public boolean actualizar(Bundle datos) {
+    public boolean actualizarLocal(Bundle datos) {
 
         Boolean retorno = false;
         String queryUpdate = "UPDATE " + TABLE_NAME + " SET nombre='" + datos.getString("name") + "', server='" + datos.getString("server") +
@@ -89,10 +96,9 @@ public class DataAccessLocal extends SQLiteAssetHelper {
                 sendBroadcast();
             } catch (SQLException e) {
                 logFile.appendLog(TAG, e.getMessage());
-
             }
         }
-        logFile.appendLog(TAG,Constantes.msjUpdate);
+        logFile.appendLog(TAG, Constantes.msjUpdate);
         return retorno;
     }
 
@@ -119,7 +125,7 @@ public class DataAccessLocal extends SQLiteAssetHelper {
                 logFile.appendLog(TAG, e.getMessage());
             }
         }
-        logFile.appendLog(TAG,Constantes.msjUpdatePassword);
+        logFile.appendLog(TAG, Constantes.msjUpdatePassword);
         return retorno;
     }
 
@@ -152,12 +158,92 @@ public class DataAccessLocal extends SQLiteAssetHelper {
 
 
     /**
+     * Actualiza el estado del equipo en la bd local
+     *
+     * @param estado int estado  (0=deshabilitado; 1=habilitado)
+     * @return true si se actualizo correctamente
+     */
+    public boolean actualizarEstado(int estado) {
+        Boolean retorno = false;
+        String queryUpdate = "UPDATE " + TABLE_NAME + " SET estado='" + estado + "' WHERE id='1'";
+        Log.i("SQL", queryUpdate);
+        //actualizar bd local con las variables
+        SQLiteDatabase db = getWritableDatabase();
+        if (db != null) {
+            try {
+                db.execSQL(queryUpdate);
+                db.close();
+                retorno = true;
+                sendBroadcast();
+            } catch (SQLException e) {
+                logFile.appendLog(TAG, e.getMessage());
+            }
+        }
+        logFile.appendLog(TAG,Constantes.msjUpdateEstado);
+        return retorno;
+    }
+
+    /**
+     * Actualiza el valor de intervalo GPS en la bd local
+     *
+     * @param intervalo intervalo gps en segundos
+     * @return true o false
+     */
+    public boolean actualizarIntervaloGPS (String intervalo) {
+        Boolean retorno = false;
+        String queryUpdate = "UPDATE " + TABLE_NAME + " SET gpsscope='" + intervalo + "' WHERE id='1'";
+        Log.i("SQL", queryUpdate);
+        //actualizar bd local con las variables
+        SQLiteDatabase db = getWritableDatabase();
+        if (db != null) {
+            try {
+                db.execSQL(queryUpdate);
+                db.close();
+                retorno = true;
+                sendBroadcast();
+            } catch (SQLException e) {
+                logFile.appendLog(TAG, e.getMessage());
+            }
+        }
+        logFile.appendLog(TAG,Constantes.msjUpdateIntervaloGPS);
+        return retorno;
+    }
+
+    /**
+     * Actualiza el valor de intervalo de sincronizacion en la bd local
+     *
+     * @param intervalo intervalo de sincronizacion en segundos
+     * @return true o false dependiendo del resultado de actualizacion
+     */
+    public boolean actualizarIntervaloSincro (String intervalo) {
+        Boolean retorno = false;
+        String queryUpdate = "UPDATE " + TABLE_NAME + " SET syncroscope='" + intervalo + "' WHERE id='1'";
+        Log.i("SQL", queryUpdate);
+        //actualizar bd local con las variables
+        SQLiteDatabase db = getWritableDatabase();
+        if (db != null) {
+            try {
+                db.execSQL(queryUpdate);
+                db.close();
+                retorno = true;
+                sendBroadcast();
+            } catch (SQLException e) {
+                logFile.appendLog(TAG, e.getMessage());
+            }
+        }
+        logFile.appendLog(TAG,Constantes.msjUpdateIntervaloSincro);
+        return retorno;
+    }
+
+
+    /**
      * Envio un broadcast local alertando que se actualizo la BD local
      */
     private void sendBroadcast() {
         Intent resultsIntent = new Intent("BDLOCAL_UPDATE");
         LocalBroadcastManager.getInstance(context).sendBroadcast(resultsIntent);
     }
+
 
     /**
      * Actualiza el registro con la fecha de la ultima actualizacion
@@ -179,5 +265,6 @@ public class DataAccessLocal extends SQLiteAssetHelper {
             }
         }
     }
+
 
 }

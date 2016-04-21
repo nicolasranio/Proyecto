@@ -126,6 +126,18 @@
             android:layout_alignParentRight="true"
             android:text="Actualizar"
             /-->
+        <TextView
+            android:id="@+id/tv_enabled"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/et_lastact_r"
+            android:paddingBottom="10dp"
+            android:paddingTop="10dp"
+            android:text="DISPOSITIVO HABILITADO"
+            android:textAlignment="center"
+            android:textColor="#4cdbc5"
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
     </RelativeLayout>
 

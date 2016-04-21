@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.acme.proyecto.R;
 import com.acme.proyecto.data.DataAccessLocal;
@@ -52,9 +53,10 @@ public class StateFragment extends Fragment {
         ActualizarCampos();
     }
 
-
     /**
      * Actualiza los widgets de la vista con los datos de la bd local
+     *
+     * @throws NullPointerException
      */
     private void ActualizarCampos() throws NullPointerException{
         Bundle args = dataAccessLocal.consultar();
@@ -63,11 +65,18 @@ public class StateFragment extends Fragment {
             EditText etServer = (EditText) this.getView().findViewById(R.id.et_server_r);
             EditText etPort = (EditText) this.getView().findViewById(R.id.et_puerto_r);
             EditText etLastSincro = (EditText) this.getView().findViewById(R.id.et_lastact_r);
+            TextView estado = (TextView) this.getView().findViewById(R.id.tv_enabled);
             etLastSincro.setText(args.getString("lastsincro"));
             etName.setText(args.getString("name"));
             etImei.setText(args.getString("imei"));
             etServer.setText(args.getString("server"));
             etPort.setText(args.getString("port"));
+            if ((args.getInt("estado"))==1){
+                estado.setText(R.string.tv_estado_e);
+            }else {
+                estado.setText(R.string.tv_estado_d);
+              //  estado.setTextColor(FFE42857);
+            }
     }
 }
 

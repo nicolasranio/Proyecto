@@ -12,5 +12,8 @@
     <string name="btn_viewlog">Ver Log</string>
     <string name="sw_service_gps">Servicio GPS</string>
     <string name="sw_service_sincro">Servicio sincronizacion remota</string>
-    <string name="btn_guardar">Guardar</string>
+    <string name="btn_guardar">Guardar cambios</string>
+
+    <string name="tv_estado_e">DISPOSITIVO HABILITADO</string>
+    <string name="tv_estado_d">DISPOSITIVO DESHABILITADO</string>
 </resources>

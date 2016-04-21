@@ -13,7 +13,7 @@ import android.widget.Toast;
 
 import com.acme.proyecto.R;
 import com.acme.proyecto.data.DataAccessGPS;
-import com.acme.proyecto.utils.Constantes;
+import com.acme.proyecto.data.DataAccessLocal;
 import com.acme.proyecto.utils.LogFile;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -21,7 +21,6 @@ import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 
-import java.io.File;
 import java.text.DateFormat;
 import java.util.Date;
 
@@ -32,10 +31,11 @@ public class ServicioGPSResidente extends Service implements GoogleApiClient.Con
 
     private String IMEI_PHONE;
     private String PHONE_STATE = null;
-    private int INTERVAL_UPDATE = Constantes.GPS_UPDATE;
+    private int INTERVAL_UPDATE;
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
     private DataAccessGPS dataAccessGPS;
+    private DataAccessLocal dataAccessLocal;
     private final DateFormat timeFormat = DateFormat.getTimeInstance(); //new SimpleDateFormat("HH/mm/ss");
     private final DateFormat dateFormat = DateFormat.getDateInstance(); //new SimpleDateFormat("dd/MM/yyyy");
     private static LogFile logFile;
@@ -51,6 +51,8 @@ public class ServicioGPSResidente extends Service implements GoogleApiClient.Con
         IMEI_PHONE = mngr.getDeviceId();
         PHONE_STATE = mngr.getNetworkOperator();
         dataAccessGPS = DataAccessGPS.getInstance(getApplicationContext());
+        dataAccessLocal = DataAccessLocal.getInstance(getApplicationContext());
+        INTERVAL_UPDATE = Integer.parseInt(dataAccessLocal.consultar().getString("gpsInterval"));
         logFile=new LogFile(getApplicationContext(),getString(R.string.app_name));
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -87,6 +89,7 @@ public class ServicioGPSResidente extends Service implements GoogleApiClient.Con
     /**
      * Comienza la tarea de trackeo utilizando la Api de Google Location Services
      */
+
     private void startTracking() {
         Log.d("TRACKING", "startTracking");
         mGoogleApiClient = new GoogleApiClient.Builder(this)
@@ -102,6 +105,7 @@ public class ServicioGPSResidente extends Service implements GoogleApiClient.Con
 
     /**
      * Genera un registro en la bd con los datos de la nueva locacion
+     *
      * @param location objeto Location con la latitud y longitud registrados
      */
     private void updateUbicacion(Location location){
@@ -125,9 +129,9 @@ public class ServicioGPSResidente extends Service implements GoogleApiClient.Con
     @Override
     public void onConnected(Bundle bundle) {
         mLocationRequest = LocationRequest.create();
-        mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
-        mLocationRequest.setInterval(INTERVAL_UPDATE);
-        mLocationRequest.setFastestInterval(INTERVAL_UPDATE / 2);
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        mLocationRequest.setInterval(INTERVAL_UPDATE*1000);
+        mLocationRequest.setFastestInterval(INTERVAL_UPDATE*1000 / 2);
         try {
             LocationServices.FusedLocationApi.requestLocationUpdates(
                     mGoogleApiClient, mLocationRequest, this);
