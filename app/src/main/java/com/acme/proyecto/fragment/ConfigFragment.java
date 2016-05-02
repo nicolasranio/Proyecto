@@ -193,7 +193,7 @@ public class ConfigFragment extends Fragment {
     private boolean estadoServicio(String servicio) {
         ActivityManager manager = (ActivityManager) getContext().getSystemService(getContext().ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo serv : manager.getRunningServices(Integer.MAX_VALUE)) {
-            //      Log.i("Servicio", serv.service.getClassName());
+                  Log.i("Servicio", serv.service.getClassName());
             if (servicio.equals(serv.service.getClassName())) {
                 Log.i("Servicio", "EL servicio " + servicio + " ya se encuentra iniciado");
                 return true;
@@ -275,7 +275,7 @@ public class ConfigFragment extends Fragment {
         //-------------------------
 
 
-        //al hacer click sobre el boton se fuerza la sincronizacion
+        //al hacer click sobre el boton se muestra el archivo log
         btnLog.setOnClickListener(new View.OnClickListener() {
 
                                       public void onClick(View v) {
@@ -303,8 +303,7 @@ public class ConfigFragment extends Fragment {
 
             @Override
             public void onClick(View v) {
-                Intent serviceIntent = new Intent(getContext(), ServicioGPSResidente.class);
-                Log.i("Swith", "Click en el switch");
+      Intent serviceIntent = new Intent(getContext(), ServicioGPSResidente.class);
                 if (swServiceGPS.isChecked()) {
                     //enciendo el servicio
                     getContext().startService(serviceIntent);

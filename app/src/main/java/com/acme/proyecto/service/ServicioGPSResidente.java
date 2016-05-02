@@ -70,7 +70,7 @@ public class ServicioGPSResidente extends Service implements GoogleApiClient.Con
         }else{
            Toast.makeText(getApplicationContext(),"Red no disponible \nNo se puede obtener la posicion",Toast.LENGTH_SHORT).show();
         }
-        return START_NOT_STICKY;
+        return START_STICKY;
     }
 
     @Override

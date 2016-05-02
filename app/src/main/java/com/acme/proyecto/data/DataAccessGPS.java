@@ -162,6 +162,7 @@ public class DataAccessGPS extends SQLiteOpenHelper {
             Log.i("updateSyncStatus", updateQuery);
             database.execSQL(updateQuery);
             database.close();
+            depurarTabla();
         }else{
             Log.i("id fallida",id +","+status);
         }

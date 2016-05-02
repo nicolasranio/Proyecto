@@ -9,19 +9,10 @@ public class Constantes {
     /**
      * Destino del webservice para la sincronizacion de bd
      */
-    public static String postTarget = "android_tracker/backend/web_service/insertar_locacion.php";
-    public static String configSincroTarget = "android_tracker/backend/web_service/sincronizar_config.php";
+    public static String postTarget = "buscadroid/backend/web_service/insertar_locacion.php";
+    public static String configSincroTarget = "buscadroid/backend/web_service/sincronizar_config.php";
 
     public static String GPS_SERVICE_NAME = "com.acme.proyecto.service.ServicioGPSResidente";
-    /**
-     * Intervalo de sincronizacion (milisegundos)
-
-    public static int SYNC_INTERVAL = 1000 * 25; //25 segundos
-
-    /**
-     * Intervalo de trackeo (milisegundos)
-     */
-
     public static String SINCRO_SERVICE_NAME = "com.acme.proyecto.service.ServicioSincroBD";
 
     //------Base de datos local-----------

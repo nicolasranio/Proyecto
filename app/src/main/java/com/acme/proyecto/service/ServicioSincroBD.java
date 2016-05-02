@@ -95,7 +95,7 @@ public class ServicioSincroBD extends Service {
             }
         };
         timer.scheduleAtFixedRate(timerTask, 0,syncInterval*1000);
-        return START_NOT_STICKY;
+        return START_STICKY;
     }
 
     @Override
